@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
-import util.WebPageCrawler;
+
 
 
 public class SQLUtil {
@@ -45,11 +45,11 @@ public class SQLUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
-			WebPageCrawler.log.error("DB.Property File not found "+e);
-		//	e.printStackTrace();
+			
+			e.printStackTrace();
 		} catch (IOException e) {
-			WebPageCrawler.log.error("DB.Property IO exception " +e);
-		//	e.printStackTrace();
+			
+			e.printStackTrace();
 		}			
 	}
 	

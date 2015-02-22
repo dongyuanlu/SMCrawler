@@ -8,8 +8,9 @@ import java.util.Iterator;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import util.PageCrawler;
 import util.SQLUtil;
-import util.WebPageCrawler;
+import util.PageCrawler;
 
 /**
  * 
@@ -50,7 +51,7 @@ public class CrawlControveralVideo {
 		//crawl video by pages
 		for(int i = 0; i < pageTotal; i++){
 			String api = apiRoot + afterIndex;
-			String jsonPage = WebPageCrawler.crawlbyUrl(api);
+			String jsonPage = PageCrawler.readUrl(api);
 			
 			//verify api
 			if(!jsonPage.contains("{")){
