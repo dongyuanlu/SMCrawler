@@ -73,6 +73,7 @@ public class SQLUtil {
 			}
 
 		} catch (SQLException e) {
+			e.printStackTrace();
 			System.err.println("Database access error occurs!");
 			return null;
 		}	
