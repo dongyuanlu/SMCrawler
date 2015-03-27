@@ -1,6 +1,7 @@
 package ldy.reddit;
 
 public class RedditArticleMedia {
+	private String name = ""; /*article name*/
 	
 	private String media_url = "";
 	
@@ -14,7 +15,9 @@ public class RedditArticleMedia {
 	
 	private String provider_name = "";
 	
-	
+	/**
+	 * Constructor
+	 */
 	public RedditArticleMedia(){
 		
 	}
@@ -22,9 +25,26 @@ public class RedditArticleMedia {
 	public RedditArticleMedia(String media_url){
 		this.media_url = media_url;
 	}
+	
+	public RedditArticleMedia(String name, String media_url){
+		this.name = name;
+		this.media_url = media_url;
+	}
 
+	///////////////////////////
+	
+	
+	
 	public String getMedia_url() {
 		return media_url;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void setMedia_url(String media_url) {

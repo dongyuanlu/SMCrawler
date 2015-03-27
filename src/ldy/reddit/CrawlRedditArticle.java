@@ -145,7 +145,7 @@ public class CrawlRedditArticle {
 			if(!objData.isNull("media")){
 				JSONObject objMedia = objData.getJSONObject("media");
 				JSONObject objOembed = objMedia.getJSONObject("oembed");
-				//parse media_url: Unique Key of media
+				//parse media_url
 				String media_url = "";
 				if(objOembed.isNull("url")){
 					media_url = parseUrlFromHtml(objOembed.getString("html"));
@@ -154,17 +154,19 @@ public class CrawlRedditArticle {
 				}
 				article.setMedia_url(media_url);
 				
-				RedditArticleMedia media = new RedditArticleMedia(media_url);
-				media.setTitle(objOembed.getString("title"));
+				RedditArticleMedia media = new RedditArticleMedia(article.getName(),media_url);
+				if(!objOembed.isNull("title")){
+					media.setTitle(objOembed.getString("title"));
+				}				
 				if(!objOembed.isNull("author_name")){
 					media.setAuthor_name(objOembed.getString("author_name"));
 				}				
-				if(objOembed.isNull("description")){
-					media.setDescription("");
-				}else{
+				if(!objOembed.isNull("description")){
 					media.setDescription(objOembed.getString("description"));
 				}
-				media.setProvider_name(objOembed.getString("provider_name"));
+				if(!objOembed.isNull("provider_name")){
+					media.setProvider_name(objOembed.getString("provider_name"));
+				}
 				media.setType(objOembed.getString("type"));
 				article.setMedia(media);
 			}
@@ -187,25 +189,23 @@ public class CrawlRedditArticle {
 	public void writeArticleList2DB(){
 		SQLUtil sql = new SQLUtil("data/database.property");
 		boolean hasMedia = false;
-		
 		String query1 = "INSERT IGNORE INTO list_reddit_contro_video VALUES("
 				+ "?,?)";
 		PreparedStatement pstmt1 = sql.createPreparedStatement(query1);
 		
 		String query2 = "INSERT IGNORE INTO reddit_article VALUES("
-				+ "?,?,?,?,?," + "?,?,?,?,?," + "?,?,?,?,?," + "?,?)";
+				+ "?,?,?,?,?," + "?,?,?,?,?," + "?,?,?,?,?," + "?,?,?)";
 		PreparedStatement pstmt2 = sql.createPreparedStatement(query2);
 		
 		
 		String query3 = "INSERT IGNORE INTO reddit_articlemedia VALUES("
-				+ "?,?,?,?,?," + "?)";
+				+ "?,?,?,?,?," + "?,?)";
 		PreparedStatement pstmt3 = sql.createPreparedStatement(query3);
 
 		
 		Iterator<RedditArticle> iter = articleList.iterator();
 		while(iter.hasNext()){
 			RedditArticle article = iter.next();
-			
 			try {
 				pstmt1.setInt(1, article.getRank());
 				pstmt1.setString(2, article.getName());
@@ -233,17 +233,23 @@ public class CrawlRedditArticle {
 				
 				pstmt2.setLong(16, article.getCreated_utc());
 				pstmt2.setString(17, article.getMedia_url());
+				if(article.getMedia() != null){
+					pstmt2.setBoolean(18, true);						
+				}else{
+					pstmt2.setBoolean(18, false);						
+				}				
 				
 				pstmt2.addBatch();
 				
 				if(article.getMedia() != null){
-					pstmt3.setString(1, article.getMedia_url());
-					pstmt3.setString(2, article.getMedia().getTitle());
-					pstmt3.setString(3, article.getMedia().getDescription());
-					pstmt3.setString(4, article.getMedia().getType());
-					pstmt3.setString(5, article.getMedia().getAuthor_name());
-					
-					pstmt3.setString(6, article.getMedia().getProvider_name());
+					pstmt3.setString(1, article.getName());
+					pstmt3.setString(2, article.getMedia_url());
+					pstmt3.setString(3, article.getMedia().getTitle());
+					pstmt3.setString(4, article.getMedia().getDescription());
+					pstmt3.setString(5, article.getMedia().getType());
+
+					pstmt3.setString(6, article.getMedia().getAuthor_name());					
+					pstmt3.setString(7, article.getMedia().getProvider_name());
 					
 					pstmt3.addBatch();
 					hasMedia = true;
