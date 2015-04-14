@@ -1,5 +1,7 @@
 package ldy.reddit;
 
+import java.util.ArrayList;
+
 /**
  * 
  * Reddit Video Element
@@ -46,6 +48,8 @@ public class RedditArticle {
 	private String media_url = null;	/*the embedded media url on original website*/
 	
 	private RedditArticleMedia media = null;
+	
+	private ArrayList<RedditComment> commentList = null;
 	
 
 	public int getRank() {
@@ -198,6 +202,14 @@ public class RedditArticle {
 
 	public void setMedia(RedditArticleMedia media) {
 		this.media = media;
+	}
+
+	public ArrayList<RedditComment> getCommentList() {
+		return commentList;
+	}
+
+	public void setCommentList(ArrayList<RedditComment> commentList) {
+		this.commentList = commentList;
 	}
 	
 	
