@@ -31,7 +31,7 @@ import util.PageCrawler;
  */
 public class CrawlRedditArticle { 
 	
-	private int pageTotal = 5;	/*when limit=100, the total number of pages to crawl*/
+	private int pageTotal = 10;	/*when limit=100, the total number of pages to crawl*/
 	private String apiRoot = RedditConfig.videoControversialAPIroot;	
 	private ArrayList<RedditArticle> articleList = new ArrayList<RedditArticle>();
 	
@@ -60,11 +60,13 @@ public class CrawlRedditArticle {
 	 * @param args
 	 */
 	public static void main(String[] args){
-		String apiRoot = RedditConfig.videoControversialAPIroot;
+//		String apiRoot = RedditConfig.videoControversialAPIroot;
+		String apiRoot = RedditConfig.videoTopAPIroot;
 		CrawlRedditArticle crawler = new CrawlRedditArticle(apiRoot);
 		crawler.crawlArticleList();	/*crawl video list, fill controVideoList*/
 		
-		crawler.writeArticleList2DB();	/*write controVideoList into database*/
+//		crawler.writeArticleList2DB("list_reddit_contro_video");	/*write controVideoList into database*/
+		crawler.writeArticleList2DB("list_reddit_top_video");
 	}
 	
 	
@@ -186,10 +188,10 @@ public class CrawlRedditArticle {
 	 * 	reddit_articlemedia
 	 * 
 	 */
-	public void writeArticleList2DB(){
+	public void writeArticleList2DB(String list_table){
 		SQLUtil sql = new SQLUtil("data/database.property");
 		boolean hasMedia = false;
-		String query1 = "INSERT IGNORE INTO list_reddit_contro_video VALUES("
+		String query1 = "INSERT IGNORE INTO " + list_table + "  VALUES("
 				+ "?,?)";
 		PreparedStatement pstmt1 = sql.createPreparedStatement(query1);
 		

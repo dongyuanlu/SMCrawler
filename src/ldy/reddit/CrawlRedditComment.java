@@ -3,6 +3,7 @@ package ldy.reddit;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 
 import org.json.JSONArray;
@@ -36,18 +37,44 @@ public class CrawlRedditComment {
 
 	}
 	
+	/**
+	 * Execute
+	 * @param args
+	 */
+	
+	public static void main(String[] args){
+		MyLog log = new MyLog(CrawlRedditComment.class.getName(), "topVideoListApril21");
+		
+		ReadRedditArticle articleReader = new ReadRedditArticle(RedditConfig.videoTopArticleListTable);
+		articleReader.readArticleIndexMap();
+		articleReader.readArticleList();
+		HashMap<String, RedditArticle> articleIndexMap = articleReader.getArticleIndexList();
+		
+		Iterator<String> iter = articleIndexMap.keySet().iterator();
+		while(iter.hasNext()){
+			String name = iter.next();
+			RedditArticle article = articleIndexMap.get(name);
+			String permalink = article.getPermalink();
+			CrawlRedditComment crawlCmmer = new CrawlRedditComment(permalink, log);
+			crawlCmmer.crawlComment();
+			crawlCmmer.writeComment2DB();
+			System.out.println(name);
+		}
+	}
+	
 	
 	/**
 	 * test
 	 */
+/*
 	public static void main(String[] args){
 		MyLog log = new MyLog(CrawlRedditComment.class.getName(), "1zgwte");
 		CrawlRedditComment crawlCmmer = new CrawlRedditComment(
-				"/r/videos/comments/1zgwte/this_is_how_languages_sound_like_to_a_nonspeaker/", log);
+				"/r/videos/comments/2watgh/rhababerbarbarabarbabarenb?rtbarbierbierbarb?rbel/", log);
 		crawlCmmer.crawlComment();
 		crawlCmmer.writeComment2DB();
 	}
-	
+	*/
 	/**
 	 * Crawl Comments of current article
 	 * Add comments into commentList
@@ -72,7 +99,11 @@ public class CrawlRedditComment {
 				j++;
 			}
 		}
-		
+		try {	//Sleep 2s, guarantee security
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		/*crawl comments hidden in the 'more' */
 		System.out.println("Crawl 'more' comments: " + moreIdList.size() + "  " + permalink);
 		for(int in = 0; in < moreIdList.size(); in++){ //NOTE: moreIdList may add new moreIds during this loop
@@ -94,8 +125,8 @@ public class CrawlRedditComment {
 					i++;
 				}
 			}
-			try {	//Sleep 1s, guarantee security
-				Thread.sleep(1000);
+			try {	//Sleep 2s, guarantee security
+				Thread.sleep(2000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

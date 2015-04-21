@@ -5,8 +5,10 @@ public class RedditConfig {
 	public static String redditRoot = "http://www.reddit.com";
 	
 	public static String videoControversialAPIroot = "http://www.reddit.com/r/videos/controversial/.json?limit=100&t=year&after=";
+	public static String videoTopAPIroot = "http://www.reddit.com/r/videos/top/.json?limit=100&t=year&after=";
 	
 	public static String videoControArticleListTable = "list_reddit_contro_video";
+	public static String videoTopArticleListTable = "list_reddit_top_video";
 	
 	public static String redditArticleTable = "reddit_article";
 	
