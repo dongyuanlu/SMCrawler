@@ -19,6 +19,8 @@ public class ReadRedditArticle {
 
 //	private ArrayList<RedditArticle> articleList = new ArrayList<RedditArticle>();
 	private String listTableName = "";
+	private String condition = "";
+	
 	private HashMap<String, RedditArticle> articleIndexMap = new HashMap<String, RedditArticle>();
 	
 	private SQLUtil sql = new SQLUtil("data/database.property");
@@ -27,6 +29,10 @@ public class ReadRedditArticle {
 		this.listTableName = listTableName;
 	}
 	
+	public ReadRedditArticle(String listTableName, String condition){
+		this.listTableName = listTableName;
+		this.condition = condition;
+	}
 	
 	public HashMap<String, RedditArticle> getArticleIndexList() {
 		return articleIndexMap;
@@ -42,7 +48,7 @@ public class ReadRedditArticle {
 	 */
 	public void readArticleIndexMap(){
 		
-		String q = "SELECT * FROM " + listTableName + " WHERE 1";
+		String q = "SELECT * FROM " + listTableName + " " + condition;
 		Statement st = sql.getStatement();
 		try {
 			ResultSet rs = st.executeQuery(q);

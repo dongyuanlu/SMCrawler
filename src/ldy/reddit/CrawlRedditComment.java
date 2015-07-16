@@ -1,7 +1,9 @@
 package ldy.reddit;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -43,22 +45,30 @@ public class CrawlRedditComment {
 	 */
 	
 	public static void main(String[] args){
-		MyLog log = new MyLog(CrawlRedditComment.class.getName(), "topVideoListApril21");
+		MyLog log = new MyLog(CrawlRedditComment.class.getName(), "topVideoListJul02");
+		String condition = "WHERE category='top_month' AND domain='video' AND flag='at20150625160000'";
 		
-		ReadRedditArticle articleReader = new ReadRedditArticle(RedditConfig.videoTopArticleListTable);
+		ReadRedditArticle articleReader = new ReadRedditArticle(RedditConfig.listRedditTable,condition);
 		articleReader.readArticleIndexMap();
 		articleReader.readArticleList();
 		HashMap<String, RedditArticle> articleIndexMap = articleReader.getArticleIndexList();
-		
 		Iterator<String> iter = articleIndexMap.keySet().iterator();
+		int i = 0;
 		while(iter.hasNext()){
 			String name = iter.next();
 			RedditArticle article = articleIndexMap.get(name);
 			String permalink = article.getPermalink();
 			CrawlRedditComment crawlCmmer = new CrawlRedditComment(permalink, log);
+			//if has crawled the comments of this article, continue
+			if(crawlCmmer.hasCrawledComments(name)){	
+				System.out.println(i++ + name);
+				continue;
+			}
+			//Crawl the comments of current article
 			crawlCmmer.crawlComment();
 			crawlCmmer.writeComment2DB();
-			System.out.println(name);
+			
+			System.out.println(i++ + name);
 		}
 	}
 	
@@ -81,6 +91,7 @@ public class CrawlRedditComment {
 	 * 
 	 */
 	public void crawlComment(){
+		
 		/*crawl comments on the page*/
 		System.out.println("Crawl comments: " + permalink);
 		String pageContent = PageCrawler.readUrl(commentApi);
@@ -132,7 +143,12 @@ public class CrawlRedditComment {
 			}
 		}
 		
-		log.writeLogList();
+		//write failed comment url list into logs
+		if(log.getLogListSize() > 0){
+			log.writeLogList();
+			log.clearLogList();
+		}
+		
 	}
 	
 	/**
@@ -224,7 +240,7 @@ public class CrawlRedditComment {
 	public void writeComment2DB(){
 		SQLUtil sql = new SQLUtil("data/database.property");
 		String query = "INSERT IGNORE INTO " + RedditConfig.redditComment + "  VALUES("
-				+ "?,?,?,?,?," + "?,?,?,?,?," + "?)";
+				+ "?,?,?,?,?," + "?,?,?,?,?," + "?,?)";
 		PreparedStatement ps = sql.createPreparedStatement(query);
 		
 		Iterator<RedditComment> iter = this.commentList.iterator();
@@ -244,6 +260,16 @@ public class CrawlRedditComment {
 					ps.setLong(10, cmm.getCreated());
 					ps.setLong(11, cmm.getCreated_utc());
 					
+					//if reply to article, write "" into replyto_author
+					if(cmm.getParent_id().equals(cmm.getLink_id())){
+						ps.setString(12, "");
+					}
+					//else if reply to comment, write null into replyto_author
+					else{
+						ps.setNull(12, java.sql.Types.VARCHAR);
+					}
+					
+					
 					ps.addBatch();
 			}
 			
@@ -252,6 +278,30 @@ public class CrawlRedditComment {
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Given article name, if has crawled its comments, return true;
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public boolean hasCrawledComments(String name){
+		SQLUtil sql = new SQLUtil("data/database.property");
+		String query = "SELECT * FROM " + RedditConfig.redditComment + " WHERE link_id=\"" + name+"\"";
+		Statement st = sql.getStatement();
+		try {
+			ResultSet rs = st.executeQuery(query);
+			if(rs.next()){
+				return true;
+			}else{
+				return false;
+			}
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+			return false;
 		}
 	}
 }

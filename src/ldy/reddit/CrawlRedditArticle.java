@@ -31,12 +31,20 @@ import util.PageCrawler;
  */
 public class CrawlRedditArticle { 
 	
+	//////////Set API//////////////////
 	private int pageTotal = 10;	/*when limit=100, the total number of pages to crawl*/
-	private String apiRoot = RedditConfig.videoControversialAPIroot;	
-	private ArrayList<RedditArticle> articleList = new ArrayList<RedditArticle>();
+	private String apiRoot = RedditConfig.videoTopAPIMonthroot;	
 	
+	
+	////Record in list_reddit table /////////
+	private String DOMAIN = "video";                 ///
+	private String CATEGORY = "top_month";                ////t=day
+	private String FLAG = "at20150625160000";     ///
+	/////////////////////////////////////////
 	private int rankIndex = 1;
 
+	
+	private ArrayList<RedditArticle> articleList = new ArrayList<RedditArticle>();
 	/**
 	 * Constructors
 	 * 
@@ -61,12 +69,12 @@ public class CrawlRedditArticle {
 	 */
 	public static void main(String[] args){
 //		String apiRoot = RedditConfig.videoControversialAPIroot;
-		String apiRoot = RedditConfig.videoTopAPIroot;
-		CrawlRedditArticle crawler = new CrawlRedditArticle(apiRoot);
+
+		CrawlRedditArticle crawler = new CrawlRedditArticle();
 		crawler.crawlArticleList();	/*crawl video list, fill controVideoList*/
 		
 //		crawler.writeArticleList2DB("list_reddit_contro_video");	/*write controVideoList into database*/
-		crawler.writeArticleList2DB("list_reddit_top_video");
+		crawler.writeArticleList2DB();
 	}
 	
 	
@@ -84,6 +92,17 @@ public class CrawlRedditArticle {
 			String api = apiRoot + afterIndex;
 			String jsonPage = PageCrawler.readUrl(api);
 			
+			if(jsonPage == null){
+				i--;
+				try {
+					Thread.sleep(8*1000);
+				} catch (InterruptedException e) {
+
+					e.printStackTrace();
+				}
+				System.err.println("JSONPAGE == null");
+				continue;
+			}
 			//verify api
 			if(!jsonPage.contains("{")){
 				articleList = null;
@@ -94,8 +113,19 @@ public class CrawlRedditArticle {
 			}
 			
 			afterIndex = parseVideoPage(jsonPage); //add all videos in this page into list
-			
+									
 			System.out.println("crawl " + i + " page");
+			
+			if(afterIndex.equalsIgnoreCase("null")){
+				break;
+			}
+
+			
+//			try {
+//				Thread.sleep(10*1000);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
 		}
 	}
 	
@@ -113,7 +143,11 @@ public class CrawlRedditArticle {
 		//get next page index: after
 		JSONObject pageObject = new JSONObject(jsonPage);
 		JSONObject dataObject = pageObject.getJSONObject("data");
+		if(dataObject.isNull("after")){
+			return "null";
+		}
 		String afterIndex = dataObject.getString("after");
+		System.out.println(afterIndex);
 		
 		//parse videos in this page
 		JSONArray children = dataObject.getJSONArray("children");
@@ -188,11 +222,11 @@ public class CrawlRedditArticle {
 	 * 	reddit_articlemedia
 	 * 
 	 */
-	public void writeArticleList2DB(String list_table){
+	public void writeArticleList2DB(){
 		SQLUtil sql = new SQLUtil("data/database.property");
 		boolean hasMedia = false;
-		String query1 = "INSERT IGNORE INTO " + list_table + "  VALUES("
-				+ "?,?)";
+		String query1 = "INSERT IGNORE INTO list_reddit  VALUES("
+				+ "?,?,?,?,?)";
 		PreparedStatement pstmt1 = sql.createPreparedStatement(query1);
 		
 		String query2 = "INSERT IGNORE INTO reddit_article VALUES("
@@ -211,6 +245,9 @@ public class CrawlRedditArticle {
 			try {
 				pstmt1.setInt(1, article.getRank());
 				pstmt1.setString(2, article.getName());
+				pstmt1.setString(3, CATEGORY);
+				pstmt1.setString(4, DOMAIN);
+				pstmt1.setString(5, FLAG);
 				
 				pstmt1.addBatch();
 				
