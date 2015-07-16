@@ -1,76 +1,164 @@
 package ldy.instagram;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.TimeZone;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import util.WebPageCrawler;
-import wing.ldy.instagram.InstagramPhotoEle;
+import util.PageCrawler;
+import util.SQLUtil;
+import ldy.instagram.InstagramPhoto;
 
+/**
+ * 
+ * CRAWL photo stream of users
+ * 
+ * @author ellen
+ *
+ */
 public class InstagramUserPhotoCrawler {
+
+	private ArrayList<InstagramPhoto> photoList;
+	
+	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
+	private static ReadInstagram reader;
+	private static WriteInstagram writer;
+	
+		
+	/**
+	 * Constructor
+	 */
+	public InstagramUserPhotoCrawler(){
+		this.photoList = new ArrayList<>();
+		reader = new ReadInstagram();
+		writer = new WriteInstagram();
+
+	}
 	
 	
-	
+	public static void main(String[] args){
+		InstagramUserPhotoCrawler photoCrawler = new InstagramUserPhotoCrawler();
+		photoCrawler.crawlUsersPhotoStream();
+	}
 	
 	
 	
 	/**
-	 * Given userId, get recent public photo stream
-	 * Return an ArrayList
 	 * 
-	 * @param userId
-	 * @return
+	 * Crawl the photo stream of users in instagram_user table whose photo stream not crawled
+	 * AND Write photos into instagram_photo table
+	 * If failed, write userId into bad user table with flag 'photostream'
+	 * 
 	 */
-	public ArrayList<InstagramPhoto> getUserRecentStream(String userId){
+	public void crawlUsersPhotoStream(){
+
+		ArrayList<String> userIdsToCrawl = reader.readUserIdInUserTableNotPhotoTable();
 		
-		ArrayList<InstagramPhoto> photoList = new ArrayList<InstagramPhotoEle>();
-		
-		String api = userRecentBaseUrl + userId + "/media/recent/?access_token=" + access_token + "&count=10000";
-		String jsonPage = WebPageCrawler.crawlbyUrl(api);
-		
-		if(!jsonPage.contains("{")){
-			return null;
+		for(int i = 0; i < userIdsToCrawl.size(); i++){
+
+			String userId = userIdsToCrawl.get(i);
+			String access_token = InstagramConfig.accessTokens[i%3]; //select one token
+
+			//Crawl photo stream and write into table
+			boolean flag = getUserRecentStream(userId, access_token);
+
+			if(!flag){ //if failed
+				writer.writeBadUser2DB(userId, InstagramConfig.badUserTable, "photostream");
+				
+			}
 		}
+	}
+	
+	
+	
+	/**
+	 * 
+	 * Crawl user's recent public photo stream
+	 * Write the photos into instagram_photo table
+	 * 
+	 * @param userId: the id of user
+	 * @return 
+	 * 		true: successfully crawled user's photos
+	 * 		false: failed to get user's photos; 
+	 * 	  
+	 */
+	public boolean getUserRecentStream(String userId, String access_token){
+		photoList.clear();
 		
-		JSONObject jObj = new JSONObject(jsonPage);
-		JSONObject obj = jObj.getJSONObject("meta");
+		//GET photos that are uploaded later than existing ones
+//		long latestPhotoTimestamp = getLatestTimestamp(userId);
+		String api = InstagramConfig.userRecentBaseUrl + userId + "/media/recent/?access_token=" + access_token
+				+ "&count=40";
+		String jsonPage = PageCrawler.readUrl(api);
 		
-		if(!obj.isNull("code")){
-			if(obj.getInt("code") == 200){	//If state is OK
-				
-				JSONArray jsonA = jObj.getJSONArray("data");
-				
-				for(int i = 0; i<jsonA.length(); i++){
-					JSONObject o = jsonA.getJSONObject(i);
-					InstagramPhotoEle photo = parsePhotoFromObj(o);
-					photo.setUserId(userId);
-					photoList.add(photo);
-					
-				}
+		//LOOP for pages
+		while(api.length() > 0){
+			
+			//Check crawled json page
+			if(jsonPage == null){
+				System.err.println(api + ": null");
+				return false;
+			}
+			if(!jsonPage.contains("{")){
+				System.err.println(api + ": not contains '{'");
+				return false;
+			}		
+			
+			JSONObject jObj = new JSONObject(jsonPage);
+			
+			//PAESE next page api
+			JSONObject pagiObj = jObj.getJSONObject("pagination");
+			if(!pagiObj.isNull("next_url")){	//if next page is null, break loop
+				api = "";
+			}
+			else{
+				api = pagiObj.getString("next_url");
 			}
 			
-		}else{
-			return null;
+			//Parse meta data
+			JSONObject obj = jObj.getJSONObject("meta");			
+			if(!obj.isNull("code")){
+				if(obj.getInt("code") == 200){	//If state is OK
+					
+					JSONArray jsonA = jObj.getJSONArray("data");
+					
+					for(int i = 0; i<jsonA.length(); i++){
+						JSONObject o = jsonA.getJSONObject(i);
+						InstagramPhoto photo = parsePhotoFromObj(o);
+						photo.setUserId(userId);
+						photoList.add(photo);
+						
+					}
+				}
+				
+			}else{
+				return false;
+			}
+			
 		}
 		
-		return photoList;
+		//WRITE Instagram photo list into table
+		writePhoto2DB();
+		
+		return true;
 	}
 	
 	
 	/**
-	 * Given one photo JSONObject, extract InstagramPhotoEle
+	 * 
+	 * Given one photo JSONObject, parse InstagramPhoto photo
 	 * 
 	 * @param obj
-	 * @return
+	 * @return InstagramPhoto
 	 */
-	public InstagramPhotoEle parsePhotoFromObj(JSONObject obj){
+	public InstagramPhoto parsePhotoFromObj(JSONObject obj){
 		
-		InstagramPhotoEle photo = new InstagramPhotoEle();
+		InstagramPhoto photo = new InstagramPhoto();
 		
 		String photoId = obj.getString("id");
 		photo.setPhotoId(photoId);
@@ -86,9 +174,9 @@ public class InstagramUserPhotoCrawler {
 		
 		String timestamp = obj.getString("created_time");
 		long timeS = Long.parseLong(timestamp)*1000;
-		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
-		String time = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date (timeS));
-		photo.setCreated_time(time);
+//		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+//		String time = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date (timeS));
+		photo.setCreated_time("");
 		photo.setCreated_time_long(timeS);
 		
 		String text = "";
@@ -198,18 +286,18 @@ public class InstagramUserPhotoCrawler {
 	 * @param photoList
 	 * @return
 	 */
-	public boolean writePhoto2DB(ArrayList<InstagramPhotoEle> photoList){
-		String query = "insert ignore into " + instagramPhotoTable + " values("
+	public boolean writePhoto2DB(){
+		String query = "insert ignore into " + InstagramConfig.instagramPhotoTable + " values("
 				+ "?,?,?,?,?," + "?,?,?,?,?," +"?,?,?,?,?," + "?,?,?,?)";
 		PreparedStatement pstmt = sql.createPreparedStatement(query);
 		
-		Iterator<InstagramPhotoEle> iter = photoList.iterator();
+		Iterator<InstagramPhoto> iter = photoList.iterator();
 		
 		try {
 			
 			while(iter.hasNext()){
 				
-				InstagramPhotoEle photo = iter.next();
+				InstagramPhoto photo = iter.next();
 				
 				pstmt.setString(1, photo.getPhotoId());
 				pstmt.setString(2, photo.getUserId());
@@ -249,5 +337,34 @@ public class InstagramUserPhotoCrawler {
 		}
 	}
 
+	
+	/**
+	 * 
+	 * GET latest created_time_long (second) of userid's photos 
+	 * 
+	 * @param userId
+	 * @return latest created_time_long (format in second, not millisecond)
+	 * 
+	 */
+	public long getLatestTimestamp(String userId){
+		long timestamp = 0;
+		
+		String query = "SELECT max(created_time_long) FROM " + InstagramConfig.instagramPhotoTable + " WHERE user_id='" + userId + "'";
+		Statement st = sql.getStatement();
+		
+		try {
+			ResultSet rs = st.executeQuery(query);
+			while(rs.next()){
+				timestamp = rs.getLong("max(created_time_long)") / 1000;
+			}
+			
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+		}
+		
+		
+		return timestamp;
+	}
 
 }

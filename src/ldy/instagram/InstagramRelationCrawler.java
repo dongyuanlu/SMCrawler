@@ -37,7 +37,8 @@ public class InstagramRelationCrawler {
 	
 	private static Random generator = new Random();
 	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
-	private static ReadInstagram reader = new ReadInstagram();
+	private static ReadInstagram reader;
+	private static WriteInstagram writer;
 	
 	private ArrayList<String> userIdListToCrawl;
 
@@ -49,6 +50,8 @@ public class InstagramRelationCrawler {
 	public InstagramRelationCrawler(){
 		this.access_token = InstagramConfig.accessTokens[generator.nextInt(InstagramConfig.accessTokens.length)];
 		this.relationUserList = new ArrayList<>();
+		reader = new ReadInstagram();
+		writer = new WriteInstagram();
 	}
 
 	
@@ -107,7 +110,7 @@ public class InstagramRelationCrawler {
 		
 		boolean flag_ing = getRelationUserList(followingAPI);	//get current user's followings
 		if(!flag_ing){
-			writeBadUser2DB(userId, InstagramConfig.badUserTable, "following");
+			writer.writeBadUser2DB(userId, InstagramConfig.badUserTable, "following");
 		}
 		else{
 			writeUser2DB(relationUserList, InstagramConfig.instagramUserTable);
@@ -122,7 +125,7 @@ public class InstagramRelationCrawler {
 		
 		boolean flag_edby = getRelationUserList(followedbyAPI);	//get current user's followed by users
 		if(!flag_edby){
-			writeBadUser2DB(userId, InstagramConfig.badUserTable, "followedby");
+			writer.writeBadUser2DB(userId, InstagramConfig.badUserTable, "followedby");
 		}
 		else{
 			writeUser2DB(relationUserList, InstagramConfig.instagramUserTable);
@@ -288,27 +291,5 @@ public class InstagramRelationCrawler {
 	}
 	
 	
-	/**
-	 * 
-	 * IF failed to get user's relation, write into badusertable
-	 * 
-	 * @param userId
-	 * @param tableName
-	 * @param cause
-	 */
-	public void writeBadUser2DB(String userId, String tableName, String cause){
-		String query = "INSERT INTO " + tableName + " values('" + userId + "', '" + cause + "')";
-		Statement st = sql.getStatement();
-		
-		try {
-			st.execute(query);
-			
-			st.close();
-		} catch (SQLException e) {
-
-			e.printStackTrace();
-		}
-			
-	}
 
 }

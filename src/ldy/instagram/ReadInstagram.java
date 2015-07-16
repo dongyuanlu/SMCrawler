@@ -118,6 +118,39 @@ public class ReadInstagram {
 	
 	/**
 	 * 
+	 * GET user id list from instagram_user table, whose photo stream not crawled
+	 * 
+	 * @return
+	 */
+	public ArrayList<String> readUserIdInUserTableNotPhotoTable(){
+		ArrayList<String> userList = new ArrayList();
+		String q = "SELECT id FROM " + InstagramConfig.instagramUserTable + " WHERE "
+				+ "id NOT IN (SELECT DISTINCT user_id FROM " + InstagramConfig.instagramPhotoTable + ")";
+		Statement st = sql.getStatement();
+		
+		try {
+			ResultSet rs = st.executeQuery(q);
+			
+			while(rs.next()){
+				String id = rs.getString("id");
+				
+				userList.add(id);
+			}
+			
+			rs.close();
+			st.close();
+			return userList;
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+			return null;
+		}
+
+	} 
+	
+	
+	/**
+	 * 
 	 * Count the number of users in instagram_user table
 	 * 
 	 * @return
