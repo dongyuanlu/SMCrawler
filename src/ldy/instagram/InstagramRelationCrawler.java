@@ -71,7 +71,8 @@ public class InstagramRelationCrawler {
 	 */
 	public void evolveCrawling(){
 		
-		//Iteratively crawl the relations of users in instagram_user table, whose relations has not been crawled
+		//Iteratively crawl the relations of users
+		//in instagram_user table, whose relations has not been crawled
 		do{
 			userIdListToCrawl= reader.readUserIdInUserTableNotRelationTable();
 			
