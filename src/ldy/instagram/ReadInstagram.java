@@ -221,17 +221,20 @@ public class ReadInstagram {
 		ArrayList<String> userList = new ArrayList();
 
 		userList.add(userId);
+		int start = 0;
 		
 		//Loop for each step
 		for(int i = 0; i < step; i++)
 		{
-			Iterator<String> iter = userList.iterator();
-			while(iter.hasNext()){
-				String user_id = iter.next();
+			int size = userList.size();
+			for(int k = start; k < size; k++){				
+				String user_id = userList.get(k);
 				userList.addAll(readUserNeighbors(user_id)); //add user_id's direct neighbors into userList
-			}			
+			}
+			start = size;
+
 		}
-		
+		s
 		return userList;
 	}
 	
