@@ -117,7 +117,7 @@ public class InstagramUserPhotoCrawler {
 				api = "";
 			}
 			else{
-				api = pagiObj.getString("next_url");
+				api = pagiObj.getString("next_url") + "&count=40";
 			}
 			
 			//Parse meta data

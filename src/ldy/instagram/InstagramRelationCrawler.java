@@ -36,7 +36,7 @@ public class InstagramRelationCrawler {
 	
 	private int THRESHOLD = 0;
 	
-	private static Random generator = new Random();
+//	private static Random generator = new Random();
 	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
 	private static ReadInstagram reader;
 	private static WriteInstagram writer;
@@ -45,6 +45,13 @@ public class InstagramRelationCrawler {
 
 	private ArrayList<InstagramUser> relationUserList;	// follower/followee list
 	
+	
+	//////for debug////////
+	
+	int index;
+	long start;
+	/////////end debug////////
+	
 	/**
 	 * Constructor
 	 */
@@ -52,6 +59,11 @@ public class InstagramRelationCrawler {
 		this.relationUserList = new ArrayList<>();
 		reader = new ReadInstagram();
 		writer = new WriteInstagram();
+		
+		//for debug////
+		int index = 0;
+		long start = System.currentTimeMillis();
+		/////end debug
 	}
 
 	
@@ -152,61 +164,52 @@ public class InstagramRelationCrawler {
 	 * @return
 	 */
 	public boolean getRelationUserList(String apiUrl){
+		String url = apiUrl;
 		
-		//Crawl json page and json object
-		String jsonPage = PageCrawler.readUrl(apiUrl);
-
-		if(jsonPage == null){
-			System.err.println(apiUrl + ": null");
-			return false;
-		}
-		if(!jsonPage.contains("{")){
-			System.err.println(apiUrl + ": not contains '{'");
-			return false;
-		}		
-		JSONObject pageObject = new JSONObject(jsonPage);
-		
-		//Check status
-		JSONObject metaObject = pageObject.getJSONObject("meta");
-		if(metaObject.isNull("code") || ( !metaObject.isNull("code") && metaObject.getInt("code") != 200 )){
-			return false;
-		}
-		
-		//Get followList from next page if there is any
-		JSONObject nextObject = pageObject.getJSONObject("pagination");
-		if(!nextObject.isNull("next_cursor")){ 
-			String nextApi = apiUrl + "&cursor=" + nextObject.getString("next_cursor");
-			boolean flag = getRelationUserList(nextApi);
-			if(!flag){
+		while(url.length() > 0){
+			//Crawl json page and json object
+			String jsonPage = PageCrawler.readUrl(url);
+			
+			//////for debug///////////////
+			index++;
+			if(index ==  20){
+				System.out.println(System.currentTimeMillis() - start);
+			}
+			//////end debug///////////////
+			
+			if(!checkJsonPage(jsonPage, url)){	//check jsonPage, if false
 				return false;
 			}
+
+			JSONObject pageObject = new JSONObject(jsonPage);
 			
+			//Check status code
+			if(!checkMetaCode(pageObject)){	//check status code, if not 200, return false
+				return false;
+			}
+						
+			//Get followList from current page		
+			JSONArray dataArray = pageObject.getJSONArray("data");
+			
+			for(int i = 0; i<dataArray.length(); i++)
+			{			
+				JSONObject o = dataArray.getJSONObject(i);	//parse InstagramUser from jsonobject
+				relationUserList.add(parseUserObj(o));
+			}	//for end
+
+			
+			//Get followList from next page if there is any
+			JSONObject nextObject = pageObject.getJSONObject("pagination");
+			if(!nextObject.isNull("next_url"))
+			{ 
+				url = nextObject.getString("next_url");			
+			}else
+			{
+				url = "";
+			}
+
 		}
 		
-		//Get followList from current page
-		
-		JSONArray dataArray = pageObject.getJSONArray("data");
-		
-		for(int i = 0; i<dataArray.length(); i++){
-			InstagramUser user = new InstagramUser();
-			
-			JSONObject o = dataArray.getJSONObject(i);
-			
-			user.setUsername(o.getString("username"));			
-			if(!o.isNull("bio")){ user.setBio(o.getString("bio")); }
-			user.setFull_name(o.getString("full_name"));
-			user.setId(o.getString("id"));
-			user.setProfile_picture(o.getString("profile_picture"));
-			if(!o.isNull("website")){ user.setWebsite(o.getString("website"));}
-			
-			relationUserList.add(user);
-		}	//for end
-		
-		try {
-			Thread.sleep(3000);	//For security
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		return true;
 	}
 	
@@ -298,5 +301,48 @@ public class InstagramRelationCrawler {
 	}
 	
 	
+	/**
+	 * 
+	 * Check jsonPage
+	 * 
+	 * @param jsonPage
+	 * @param apiUrl
+	 * @return
+	 */
+	public boolean checkJsonPage(String jsonPage, String apiUrl){
+		if(jsonPage == null){
+			System.err.println(apiUrl + ": null");
+			return false;
+		}
+		if(!jsonPage.contains("{")){
+			System.err.println(apiUrl + ": not contains '{'");
+			return false;
+		}
+		return true;
+
+	}
+	
+	
+	public boolean checkMetaCode(JSONObject pageObject){
+		JSONObject metaObject = pageObject.getJSONObject("meta");
+		if(metaObject.isNull("code") || ( !metaObject.isNull("code") && metaObject.getInt("code") != 200 )){
+			return false;
+		}
+		return true;
+	}
+	
+	
+	public InstagramUser parseUserObj(JSONObject o){
+		InstagramUser user = new InstagramUser();
+		
+		user.setUsername(o.getString("username"));			
+		if(!o.isNull("bio")){ user.setBio(o.getString("bio")); }
+		user.setFull_name(o.getString("full_name"));
+		user.setId(o.getString("id"));
+		user.setProfile_picture(o.getString("profile_picture"));
+		if(!o.isNull("website")){ user.setWebsite(o.getString("website"));}
+
+		return user;
+	}
 
 }
