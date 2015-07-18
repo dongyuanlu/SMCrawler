@@ -116,6 +116,41 @@ public class ReadInstagram {
 
 	}
 	
+	
+	/**
+	 * 
+	 * READ userid list which in user table not in relation table and baduser table
+	 * 
+	 * @return
+	 */
+	public ArrayList<String> readUserIdInUserTableNotRelationNotBaduserTable(){
+		ArrayList<String> userList = new ArrayList();
+		String q = "SELECT id FROM " + InstagramConfig.instagramUserTable + " WHERE "
+				+ "id NOT IN (SELECT DISTINCT user1 FROM " + InstagramConfig.instagramRelationTable + ")"
+						+ " AND id NOT IN (SELECT userid FROM " + InstagramConfig.badUserTable + " WHERE cause='following' OR cause='followedby')";
+		Statement st = sql.getStatement();
+		
+		try {
+			ResultSet rs = st.executeQuery(q);
+			
+			while(rs.next()){
+				String id = rs.getString("id");
+				
+				userList.add(id);
+			}
+			
+			rs.close();
+			st.close();
+			return userList;
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+	
+	
 	/**
 	 * 
 	 * GET user id list from instagram_user table, whose photo stream not crawled

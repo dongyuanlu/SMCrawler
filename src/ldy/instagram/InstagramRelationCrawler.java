@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 
 
+
 import util.PageCrawler;
 import util.SQLUtil;
 import util.WriteArrayList2File;
@@ -33,7 +34,7 @@ public class InstagramRelationCrawler {
 	
 	private String access_token;
 	
-	private int THRESHOLD = 10;
+	private int THRESHOLD = 0;
 	
 	private static Random generator = new Random();
 	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
@@ -48,7 +49,6 @@ public class InstagramRelationCrawler {
 	 * Constructor
 	 */
 	public InstagramRelationCrawler(){
-		this.access_token = InstagramConfig.accessTokens[generator.nextInt(InstagramConfig.accessTokens.length)];
 		this.relationUserList = new ArrayList<>();
 		reader = new ReadInstagram();
 		writer = new WriteInstagram();
@@ -74,12 +74,17 @@ public class InstagramRelationCrawler {
 		//Iteratively crawl the relations of users
 		//in instagram_user table, whose relations has not been crawled
 		do{
-			userIdListToCrawl= reader.readUserIdInUserTableNotRelationTable();
-			
+			userIdListToCrawl= reader.readUserIdInUserTableNotRelationNotBaduserTable();
+			System.out.println("total number: " + userIdListToCrawl.size());
 			//Loop for current userList
 			for(int i = 0; i < userIdListToCrawl.size(); i++){
+				access_token = InstagramConfig.accessTokens[i%3];
 				String userId = userIdListToCrawl.get(i);
 				getRelationOfUser(userId);
+				
+				System.out.println(userId);
+				//Rest 1s for API limit
+				try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
 			}
 			
 		//until less than THRESHOLD newly users
@@ -106,7 +111,7 @@ public class InstagramRelationCrawler {
 		//*********************************
 		//GET user1 follow user2
 		
-		String followingAPI = apiUrl + "follows?access_token=" + access_token;
+		String followingAPI = apiUrl + "follows?access_token=" + access_token + "&count=100";
 		relationUserList.clear();	//clear relation user list
 		
 		boolean flag_ing = getRelationUserList(followingAPI);	//get current user's followings
@@ -121,7 +126,7 @@ public class InstagramRelationCrawler {
 		//*********************************
 		//GET user1 followed by user2
 		
-		String followedbyAPI = apiUrl + "followed-by?access_token=" + access_token;
+		String followedbyAPI = apiUrl + "followed-by?access_token=" + access_token + "&count=100";
 		relationUserList.clear();	//clear relation user list
 		
 		boolean flag_edby = getRelationUserList(followedbyAPI);	//get current user's followed by users
@@ -150,6 +155,7 @@ public class InstagramRelationCrawler {
 		
 		//Crawl json page and json object
 		String jsonPage = PageCrawler.readUrl(apiUrl);
+
 		if(jsonPage == null){
 			System.err.println(apiUrl + ": null");
 			return false;
@@ -186,12 +192,12 @@ public class InstagramRelationCrawler {
 			
 			JSONObject o = dataArray.getJSONObject(i);
 			
-			user.setUsername(o.getString("username"));
-			user.setBio(o.getString("bio"));
+			user.setUsername(o.getString("username"));			
+			if(!o.isNull("bio")){ user.setBio(o.getString("bio")); }
 			user.setFull_name(o.getString("full_name"));
 			user.setId(o.getString("id"));
 			user.setProfile_picture(o.getString("profile_picture"));
-			user.setWebsite(o.getString("website"));
+			if(!o.isNull("website")){ user.setWebsite(o.getString("website"));}
 			
 			relationUserList.add(user);
 		}	//for end
@@ -265,7 +271,7 @@ public class InstagramRelationCrawler {
 	 */
 	public boolean writeRelation2DB(String userId, ArrayList<InstagramUser> userList, String tableName, String option){
 		String query = "insert ignore into " + tableName + " values("
-				+ "?,?)";
+				+ "?,?,?)";
 		PreparedStatement pstmt = sql.createPreparedStatement(query);
 		
 		try {

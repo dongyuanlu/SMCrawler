@@ -24,7 +24,7 @@ public class WriteInstagram {
 	 * @param cause
 	 */
 	public void writeBadUser2DB(String userId, String tableName, String cause){
-		String query = "INSERT INTO " + tableName + " values('" + userId + "', '" + cause + "')";
+		String query = "INSERT IGNORE INTO " + tableName + " values('" + userId + "', '" + cause + "')";
 		Statement st = sql.getStatement();
 		
 		try {
