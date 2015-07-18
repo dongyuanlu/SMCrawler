@@ -46,12 +46,6 @@ public class InstagramRelationCrawler {
 	private ArrayList<InstagramUser> relationUserList;	// follower/followee list
 	
 	
-	//////for debug////////
-	
-	int index;
-	long start;
-	/////////end debug////////
-	
 	/**
 	 * Constructor
 	 */
@@ -60,10 +54,6 @@ public class InstagramRelationCrawler {
 		reader = new ReadInstagram();
 		writer = new WriteInstagram();
 		
-		//for debug////
-		int index = 0;
-		long start = System.currentTimeMillis();
-		/////end debug
 	}
 
 	
@@ -90,13 +80,13 @@ public class InstagramRelationCrawler {
 			System.out.println("total number: " + userIdListToCrawl.size());
 			//Loop for current userList
 			for(int i = 0; i < userIdListToCrawl.size(); i++){
-				access_token = InstagramConfig.accessTokens[i%3];
+				access_token = InstagramConfig.accessTokens[i%2]; //only use the first two tokens
 				String userId = userIdListToCrawl.get(i);
 				getRelationOfUser(userId);
 				
 				System.out.println(userId);
 				//Rest 1s for API limit
-				try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
+//				try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
 			}
 			
 		//until less than THRESHOLD newly users
@@ -169,14 +159,7 @@ public class InstagramRelationCrawler {
 		while(url.length() > 0){
 			//Crawl json page and json object
 			String jsonPage = PageCrawler.readUrl(url);
-			
-			//////for debug///////////////
-			index++;
-			if(index ==  20){
-				System.out.println(System.currentTimeMillis() - start);
-			}
-			//////end debug///////////////
-			
+						
 			if(!checkJsonPage(jsonPage, url)){	//check jsonPage, if false
 				return false;
 			}
