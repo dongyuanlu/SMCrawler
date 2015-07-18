@@ -82,9 +82,10 @@ public class InstagramRelationCrawler {
 			for(int i = 0; i < userIdListToCrawl.size(); i++){
 				access_token = InstagramConfig.accessTokens[i%2]; //only use the first two tokens
 				String userId = userIdListToCrawl.get(i);
-				getRelationOfUser(userId);
-				
 				System.out.println(userId);
+				
+				getRelationOfUser(userId);
+
 				//Rest 1s for API limit
 //				try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
 			}
@@ -121,8 +122,10 @@ public class InstagramRelationCrawler {
 			writer.writeBadUser2DB(userId, InstagramConfig.badUserTable, "following");
 		}
 		else{
+			System.out.println("start following " + relationUserList.size() + " " + System.currentTimeMillis());
 			writeUser2DB(relationUserList, InstagramConfig.instagramUserTable);
 			writeRelation2DB(userId, relationUserList, InstagramConfig.instagramRelationTable, "following");
+			System.out.println("end: " + System.currentTimeMillis());
 		}
 		
 		//*********************************
@@ -136,8 +139,10 @@ public class InstagramRelationCrawler {
 			writer.writeBadUser2DB(userId, InstagramConfig.badUserTable, "followedby");
 		}
 		else{
+			System.out.println("start followedby" + relationUserList.size() + " " + System.currentTimeMillis());
 			writeUser2DB(relationUserList, InstagramConfig.instagramUserTable);
 			writeRelation2DB(userId, relationUserList, InstagramConfig.instagramRelationTable, "followedby");
+			System.out.println("end: " + System.currentTimeMillis());
 		}
 		
 	}
