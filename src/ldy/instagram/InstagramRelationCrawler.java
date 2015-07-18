@@ -35,6 +35,7 @@ public class InstagramRelationCrawler {
 	private String access_token;
 	
 	private int THRESHOLD = 0;
+	private int nSTEP = 3;	//the distance of neighbors from seed user
 	
 //	private static Random generator = new Random();
 	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
@@ -73,10 +74,10 @@ public class InstagramRelationCrawler {
 	 */
 	public void evolveCrawling(){
 		
-		//Iteratively crawl the relations of users
-		//in instagram_user table, whose relations has not been crawled
+		//Iteratively crawl the relations of n step neighbors of seed user
+		//whose relations has not been crawled
 		do{
-			userIdListToCrawl= reader.readUserIdInUserTableNotRelationNotBaduserTable();
+			userIdListToCrawl= reader.readUserNeighborsNotCrawlRelation(InstagramConfig.seedUserId, nSTEP);
 			System.out.println("total number: " + userIdListToCrawl.size());
 			//Loop for current userList
 			for(int i = 0; i < userIdListToCrawl.size(); i++){
