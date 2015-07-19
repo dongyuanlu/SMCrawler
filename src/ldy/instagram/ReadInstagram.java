@@ -99,11 +99,11 @@ public class ReadInstagram {
 		
 		try {
 			ResultSet rs = st.executeQuery("SELECT DISTINCT userid from " + InstagramConfig.badUserTable 
-							+ "WHERE cause='following' OR cause='followedby'");
+							+ " WHERE cause='following' OR cause='followedby'");
 			
 			
 			while(rs.next()){
-				String userName = rs.getString("user1");
+				String userName = rs.getString("userid");
 				alreadyList.add(userName);
 			}
 			
@@ -197,10 +197,18 @@ public class ReadInstagram {
 		ArrayList<String> relationsList = readUserIdFromRelationTable();
 		ArrayList<String> badUserList = readUserIdFromBadUserTable();
 		
-		neighborList.removeAll(relationsList);
-		neighborList.removeAll(badUserList);
 		
-		return neighborList;
+		ArrayList<String> list = new ArrayList<String>();
+		
+		Iterator<String> iter = neighborList.iterator();
+		while(iter.hasNext()){
+			String neighbor = iter.next();
+			if(!relationsList.contains(neighbor) && !badUserList.contains(neighbor) ){
+				list.add(neighbor);
+			}
+		}
+		
+		return list;
 		
 	}
 
@@ -247,7 +255,7 @@ public class ReadInstagram {
 				}
 			}
 
-		}
+		}	
 		
 		ArrayList<String> userList = new ArrayList(neighborMap.keySet());
 		return userList;

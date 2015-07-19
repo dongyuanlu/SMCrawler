@@ -125,6 +125,7 @@ public class InstagramRelationCrawler {
 		else{
 			System.out.println("start following " + relationUserList.size() + " " + System.currentTimeMillis());
 			writeUser2DB(relationUserList, InstagramConfig.instagramUserTable);
+			System.out.println("mid: " + System.currentTimeMillis());
 			writeRelation2DB(userId, relationUserList, InstagramConfig.instagramRelationTable, "following");
 			System.out.println("end: " + System.currentTimeMillis());
 		}
@@ -215,7 +216,7 @@ public class InstagramRelationCrawler {
 	public boolean writeUser2DB(ArrayList<InstagramUser> userList, String tableName){
 		
 		//Get the user list from current user profile table
-		ArrayList<String> alreadyUserList = reader.readUserIdFromUserTable();
+//		ArrayList<String> alreadyUserList = reader.readUserIdFromUserTable();
 		
 		//If user already in user profile table, continue
 		String query = "insert ignore into " + tableName + " values("
@@ -225,9 +226,9 @@ public class InstagramRelationCrawler {
 		try {
 			for(int i = 0; i < userList.size(); i++){
 				InstagramUser user = userList.get(i);
-				if(alreadyUserList.contains(user.getId())){
-					continue;
-				}
+//				if(alreadyUserList.contains(user.getId())){
+//					continue;
+//				}
 				
 				pstmt.setString(1, user.getUsername());
 				pstmt.setString(2, user.getBio());
