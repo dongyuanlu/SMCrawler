@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 
 import util.SQLUtil;
@@ -218,23 +220,36 @@ public class ReadInstagram {
 	 * 
 	 */
 	public ArrayList<String> readUserNeighbors(String userId, int step){
-		ArrayList<String> userList = new ArrayList();
-
-		userList.add(userId);
-		int start = 0;
+		HashMap<String, Integer> neighborMap = new HashMap();
+		HashSet<String> set = new HashSet<>();
+		
+		neighborMap.put(userId, 0);
 		
 		//Loop for each step
 		for(int i = 0; i < step; i++)
 		{
-			int size = userList.size();
-			for(int k = start; k < size; k++){				
-				String user_id = userList.get(k);
-				userList.addAll(readUserNeighbors(user_id)); //add user_id's direct neighbors into userList
+			set.clear();
+			set.addAll(neighborMap.keySet());
+			Iterator<String> iter = set.iterator();
+			while(iter.hasNext()){
+				String user_id = iter.next();
+				if(neighborMap.get(user_id)==i)
+				{
+					ArrayList<String> newNeighbors = readUserNeighbors(user_id);
+					//add next level new neighbors into neighborMap
+					for(int k = 0; k < newNeighbors.size(); k++)
+					{
+						String newNeighbor = newNeighbors.get(k);
+						if(!neighborMap.containsKey(newNeighbor)){
+							neighborMap.put(newNeighbor, i+1);
+						}
+					}
+				}
 			}
-			start = size;
 
 		}
-		s
+		
+		ArrayList<String> userList = new ArrayList(neighborMap.keySet());
 		return userList;
 	}
 	
