@@ -22,8 +22,8 @@ import util.WriteArrayList2File;
 
 /**
  * 
- * Based on seed users, crawl the users' followers and followees, add the new users into table
- * Then, iteratively crawl the new users' followers and followees
+ * Based on seed users, crawl the users' followers and followings, add the new users into table
+ * Then, iteratively crawl the new users' followers and followings
  * Aim to get a social network based on seed users
  * Terminate until less than THRESHOLD new users are added
  * 
@@ -78,6 +78,7 @@ public class InstagramRelationCrawler {
 		//whose relations has not been crawled
 		do{
 			userIdListToCrawl= reader.readUserNeighborsNotCrawlRelation(InstagramConfig.seedUserId, nSTEP);
+
 			System.out.println("total number: " + userIdListToCrawl.size());
 			//Loop for current userList
 			for(int i = 0; i < userIdListToCrawl.size(); i++){
@@ -132,7 +133,7 @@ public class InstagramRelationCrawler {
 		//*********************************
 		//GET user1 followed by user2
 		
-		String followedbyAPI = apiUrl + "followed-by?access_token=" + accessToken.pickToken() + "&count=100";
+		String followedbyAPI = apiUrl + "followed-by?count=100&access_token=";
 		relationUserList.clear();	//clear relation user list
 		
 		boolean flag_edby = getRelationUserList(followedbyAPI);	//get current user's followed by users
@@ -160,11 +161,11 @@ public class InstagramRelationCrawler {
 	 * @return
 	 */
 	public boolean getRelationUserList(String apiUrl){
-		String url = apiUrl;
+		String url = apiUrl  + accessToken.pickToken();
 		
 		while(url.length() > 0){
 			//Crawl json page and json object
-			String jsonPage = PageCrawler.readUrl(url + accessToken.pickToken());
+			String jsonPage = PageCrawler.readUrl(url);
 						
 			if(!checkJsonPage(jsonPage, url)){	//check jsonPage, if false
 				return false;
@@ -191,7 +192,8 @@ public class InstagramRelationCrawler {
 			JSONObject nextObject = pageObject.getJSONObject("pagination");
 			if(!nextObject.isNull("next_url"))
 			{ 
-				url = nextObject.getString("next_url");			
+				url = nextObject.getString("next_url");	
+				url = url.replaceAll("access_token=.*?&", "access_token="+accessToken.pickToken()+"&");
 			}else
 			{
 				url = "";
