@@ -114,7 +114,7 @@ public class InstagramRelationCrawler {
 		//*********************************
 		//GET user1 follow user2
 		
-		String followingAPI = apiUrl + "follows?access_token=" + accessToken.pickToken() + "&count=100";
+		String followingAPI = apiUrl + "follows?count=100&access_token=";
 		relationUserList.clear();	//clear relation user list
 		
 		boolean flag_ing = getRelationUserList(followingAPI);	//get current user's followings
@@ -164,7 +164,7 @@ public class InstagramRelationCrawler {
 		
 		while(url.length() > 0){
 			//Crawl json page and json object
-			String jsonPage = PageCrawler.readUrl(url);
+			String jsonPage = PageCrawler.readUrl(url + accessToken.pickToken());
 						
 			if(!checkJsonPage(jsonPage, url)){	//check jsonPage, if false
 				return false;
