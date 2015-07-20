@@ -31,9 +31,7 @@ import util.WriteArrayList2File;
  *
  */
 public class InstagramRelationCrawler {
-	
-	private String access_token;
-	
+		
 	private int THRESHOLD = 0;
 	private int nSTEP = 3;	//the distance of neighbors from seed user
 	
@@ -41,6 +39,7 @@ public class InstagramRelationCrawler {
 	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
 	private static ReadInstagram reader;
 	private static WriteInstagram writer;
+	private static InstagramToken accessToken;
 	
 	private ArrayList<String> userIdListToCrawl;
 
@@ -54,6 +53,7 @@ public class InstagramRelationCrawler {
 		this.relationUserList = new ArrayList<>();
 		reader = new ReadInstagram();
 		writer = new WriteInstagram();
+		accessToken = new InstagramToken();
 		
 	}
 
@@ -81,7 +81,6 @@ public class InstagramRelationCrawler {
 			System.out.println("total number: " + userIdListToCrawl.size());
 			//Loop for current userList
 			for(int i = 0; i < userIdListToCrawl.size(); i++){
-				access_token = InstagramConfig.accessTokens[i%2]; //only use the first two tokens
 				String userId = userIdListToCrawl.get(i);
 				System.out.println(userId);
 				
@@ -115,7 +114,7 @@ public class InstagramRelationCrawler {
 		//*********************************
 		//GET user1 follow user2
 		
-		String followingAPI = apiUrl + "follows?access_token=" + access_token + "&count=100";
+		String followingAPI = apiUrl + "follows?access_token=" + accessToken.pickToken() + "&count=100";
 		relationUserList.clear();	//clear relation user list
 		
 		boolean flag_ing = getRelationUserList(followingAPI);	//get current user's followings
@@ -133,7 +132,7 @@ public class InstagramRelationCrawler {
 		//*********************************
 		//GET user1 followed by user2
 		
-		String followedbyAPI = apiUrl + "followed-by?access_token=" + access_token + "&count=100";
+		String followedbyAPI = apiUrl + "followed-by?access_token=" + accessToken.pickToken() + "&count=100";
 		relationUserList.clear();	//clear relation user list
 		
 		boolean flag_edby = getRelationUserList(followedbyAPI);	//get current user's followed by users
