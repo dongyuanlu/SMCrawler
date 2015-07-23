@@ -33,7 +33,7 @@ import util.WriteArrayList2File;
 public class InstagramRelationCrawler {
 		
 	private int THRESHOLD = 0;
-	private int nSTEP = 3;	//the distance of neighbors from seed user
+	private int nSTEP = 1;	//the distance of neighbors from seed user
 	
 //	private static Random generator = new Random();
 	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
@@ -78,7 +78,7 @@ public class InstagramRelationCrawler {
 		//whose relations has not been crawled
 		do{
 			userIdListToCrawl= reader.readUserNeighborsNotCrawlRelation(InstagramConfig.seedUserId, nSTEP);
-
+			
 			System.out.println("total number: " + userIdListToCrawl.size());
 			//Loop for current userList
 			for(int i = 0; i < userIdListToCrawl.size(); i++){
@@ -141,7 +141,7 @@ public class InstagramRelationCrawler {
 			writer.writeBadUser2DB(userId, InstagramConfig.badUserTable, "followedby");
 		}
 		else{
-			System.out.println("start followedby" + relationUserList.size() + " " + System.currentTimeMillis());
+			System.out.println("start followedby " + relationUserList.size() + " " + System.currentTimeMillis());
 			writeUser2DB(relationUserList, InstagramConfig.instagramUserTable);
 			writeRelation2DB(userId, relationUserList, InstagramConfig.instagramRelationTable, "followedby");
 			System.out.println("end: " + System.currentTimeMillis());

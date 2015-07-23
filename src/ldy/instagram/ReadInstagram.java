@@ -118,7 +118,6 @@ public class ReadInstagram {
 	
 	
 	
-	
 	/**
 	 * 
 	 * @return userId list from intagram_user table, whose relations not crawled
@@ -203,7 +202,7 @@ public class ReadInstagram {
 		Iterator<String> iter = neighborList.iterator();
 		while(iter.hasNext()){
 			String neighbor = iter.next();
-			if(!relationsList.contains(neighbor) && !badUserList.contains(neighbor) ){
+			if(!relationsList.contains(neighbor)  && !badUserList.contains(neighbor)){//
 				list.add(neighbor);
 			}
 		}
@@ -212,6 +211,8 @@ public class ReadInstagram {
 		
 	}
 
+	
+	
 	
 	
 	
