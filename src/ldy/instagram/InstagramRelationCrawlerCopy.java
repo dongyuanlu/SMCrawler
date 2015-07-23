@@ -30,7 +30,7 @@ import util.WriteArrayList2File;
  * @author Administrator
  *
  */
-public class InstagramRelationCrawler {
+public class InstagramRelationCrawlerCopy {
 		
 	private int THRESHOLD = 0;
 	private int nSTEP = 2;	//the distance of neighbors from seed user
@@ -39,7 +39,7 @@ public class InstagramRelationCrawler {
 	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
 	private static ReadInstagram reader;
 	private static WriteInstagram writer;
-	private static InstagramToken_1 accessToken;
+	private static InstagramToken_2 accessToken;	//select the second accessToken
 	
 	private ArrayList<String> userIdListToCrawl;
 
@@ -49,11 +49,11 @@ public class InstagramRelationCrawler {
 	/**
 	 * Constructor
 	 */
-	public InstagramRelationCrawler(){
+	public InstagramRelationCrawlerCopy(){
 		this.relationUserList = new ArrayList<>();
 		reader = new ReadInstagram();
 		writer = new WriteInstagram();
-		accessToken = new InstagramToken_1();
+		accessToken = new InstagramToken_2();	//select the second accessToken
 		
 	}
 
@@ -61,7 +61,7 @@ public class InstagramRelationCrawler {
 	
 	public static void main(String[] args){
 
-		InstagramRelationCrawler crawler = new InstagramRelationCrawler();
+		InstagramRelationCrawlerCopy crawler = new InstagramRelationCrawlerCopy();
 		crawler.evolveCrawling();
 		
 	}
@@ -81,7 +81,7 @@ public class InstagramRelationCrawler {
 			
 			System.out.println("total number: " + userIdListToCrawl.size());
 			//Loop for current userList
-			for(int i = 0; i < userIdListToCrawl.size(); i++){
+			for(int i = userIdListToCrawl.size()-1; i >0; i--){
 				String userId = userIdListToCrawl.get(i);
 				System.out.println(userId);
 				

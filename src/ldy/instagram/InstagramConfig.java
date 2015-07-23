@@ -4,7 +4,9 @@ public class InstagramConfig {
 	
 	public static String[] accessTokens = {"422455902.56b262f.617ca892fc4c448f9a8d4c3426e41449",
 		"145967399.7760ab2.25fed0b13a554d7eab885aa207894393",
-		"422455902.2fb31fe.e0ba0ee797224bc7b1fd1193aa93d72a"};
+		"422455902.2fb31fe.e0ba0ee797224bc7b1fd1193aa93d72a",
+		"145967399.1677ed0.9b3bba45986f472192ef5f1066a64a62",
+		"53526039.1677ed0.c210f4dbf9a44707ae558b92ad0f2c9e"};
 	
 	public static String seedUserId = "1072213";
 

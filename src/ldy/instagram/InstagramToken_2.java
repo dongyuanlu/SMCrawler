@@ -7,9 +7,10 @@ package ldy.instagram;
  * @author Administrator
  *
  */
-public class InstagramToken {
+public class InstagramToken_2 {
 	
-	private String[] tokens = InstagramConfig.accessTokens;
+	//ONLY USE 3rd, 4th tokens in InstagramConfig/////
+	private String[] tokens = {InstagramConfig.accessTokens[2],InstagramConfig.accessTokens[3]};
 	private int[] countTokens;
 	private long[] startTime;
 	
@@ -20,7 +21,7 @@ public class InstagramToken {
 	
 	private int currentIndex;
 	
-	public InstagramToken(){
+	public InstagramToken_2(){
 	
 		countTokens = new int[tokens.length];
 		startTime = new long[tokens.length];
