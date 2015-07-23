@@ -33,7 +33,7 @@ import util.WriteArrayList2File;
 public class InstagramRelationCrawler {
 		
 	private int THRESHOLD = 0;
-	private int nSTEP = 1;	//the distance of neighbors from seed user
+	private int nSTEP = 2;	//the distance of neighbors from seed user
 	
 //	private static Random generator = new Random();
 	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);

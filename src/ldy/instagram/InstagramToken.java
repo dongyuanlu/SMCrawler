@@ -15,7 +15,7 @@ public class InstagramToken {
 	
 
 	private int LIMIT = 5000; //instagram visit limit, 5000 / hour
-	private long HOUR = 3500000;	//less one hour in milliseconds
+	private long HOUR = 3600000;	//less one hour in milliseconds
 
 	
 	private int currentIndex;
@@ -25,7 +25,7 @@ public class InstagramToken {
 		countTokens = new int[tokens.length];
 		startTime = new long[tokens.length];
 		
-		currentIndex = 0;
+		currentIndex = 1;
 		startTime[currentIndex] = System.currentTimeMillis();
 
 	}
