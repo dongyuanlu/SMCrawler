@@ -13,8 +13,10 @@ public class InstagramToken {
 	private int[] countTokens;
 	private long[] startTime;
 	
-	private int LIMIT = 5000; //Instagram visit limit, 5000 / hour
-	private long HOUR = 3600000;	//one hour in milliseconds
+
+	private int LIMIT = 5000; //instagram visit limit, 5000 / hour
+	private long HOUR = 3500000;	//less one hour in milliseconds
+
 	
 	private int currentIndex;
 	
@@ -112,7 +114,7 @@ public class InstagramToken {
 		
 		try {
 			long time = HOUR - (System.currentTimeMillis() - currentTime);
-			System.out.println("sleep for " + time + ": for security");
+			System.err.println("sleep for " + time + ": for security");
 			Thread.sleep(time);
 		} catch (InterruptedException e) {
 
