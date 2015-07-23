@@ -1,14 +1,22 @@
 package ldy.instagram;
 
-
+/**
+ * 
+ * Select access_token for usage
+ * 
+ * @author Administrator
+ *
+ */
 public class InstagramToken {
 	
 	private String[] tokens = InstagramConfig.accessTokens;
 	private int[] countTokens;
 	private long[] startTime;
 	
+
 	private int LIMIT = 5000; //instagram visit limit, 5000 / hour
 	private long HOUR = 3500000;	//less one hour in milliseconds
+
 	
 	private int currentIndex;
 	
@@ -23,7 +31,13 @@ public class InstagramToken {
 	}
 	
 	
-	
+	/**
+	 * 
+	 * Iteratively pick one valid access_token from InstagramConfig.accessTokens
+	 * Under limitation: 5000 visits per hour
+	 * 
+	 * @return
+	 */
 	public String pickToken(){
 		
 		if(countTokens[currentIndex] < LIMIT)
