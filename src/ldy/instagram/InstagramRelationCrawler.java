@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 import util.PageCrawler;
 import util.SQLUtil;
-import util.WriteArrayList2File;
+
 
 
 /**
