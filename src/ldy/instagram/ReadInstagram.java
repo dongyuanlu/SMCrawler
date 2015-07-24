@@ -88,6 +88,35 @@ public class ReadInstagram {
 	
 	/**
 	 * 
+	 * READ userid list from instagram_photo table
+	 * 
+	 * @return
+	 */
+	public ArrayList<String> readUserIdFromPhotoTable(){
+		ArrayList<String> alreadyList = new ArrayList<String>();
+		
+		Statement st = sql.getStatement();
+		
+		try {
+			ResultSet rs = st.executeQuery("SELECT DISTINCT user_id from " + InstagramConfig.instagramPhotoTable);
+			
+			while(rs.next()){
+				String userName = rs.getString("user_id");
+				alreadyList.add(userName);
+			}
+			
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+		
+		return alreadyList;
+	
+	}
+
+	
+	/**
+	 * 
 	 * Read userid list from badUserTable, where cause is following or followed
 	 * 
 	 * @return
@@ -116,6 +145,29 @@ public class ReadInstagram {
 	
 	}
 	
+	public ArrayList<String> readUserIdFromBadUserTable(String cause){
+		ArrayList<String> alreadyList = new ArrayList<String>();
+		
+		Statement st = sql.getStatement();
+		
+		try {
+			ResultSet rs = st.executeQuery("SELECT DISTINCT userid from " + InstagramConfig.badUserTable 
+							+ " WHERE cause='" + cause + "'");
+			
+			
+			while(rs.next()){
+				String userName = rs.getString("userid");
+				alreadyList.add(userName);
+			}
+			
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+		
+		return alreadyList;
+	
+	}
 	
 	
 	/**
@@ -211,7 +263,32 @@ public class ReadInstagram {
 		
 	}
 
-	
+	/**
+	 * 
+	 * READ userId's step neighbors whose photos have not crawled
+	 * 
+	 * @param userId
+	 * @param step
+	 * @return
+	 */
+	public ArrayList<String> readUserNeighborsNotCrawlPhoto(String userId, int step){
+		ArrayList<String> neighborList = readUserNeighbors(userId, step);
+		ArrayList<String> photoUserList = readUserIdFromPhotoTable();
+		ArrayList<String> badUserList = readUserIdFromBadUserTable("photostream");
+
+		ArrayList<String> list = new ArrayList<String>();
+		
+		Iterator<String> iter = neighborList.iterator();
+		while(iter.hasNext()){
+			String neighbor = iter.next();
+			if(!photoUserList.contains(neighbor)  && !badUserList.contains(neighbor)){//
+				list.add(neighbor);
+			}
+		}
+		
+		return list;
+
+	}
 	
 	
 	

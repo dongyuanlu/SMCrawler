@@ -22,7 +22,7 @@ import ldy.instagram.InstagramPhoto;
  *
  */
 public class InstagramUserPhotoCrawler {
-	private int nSTEP = 2;	//the distance of neighbors from seed user
+	private int nSTEP = 1;	//the distance of neighbors from seed user
 
 	private static InstagramToken_3 accessToken;	//select the second accessToken
 
@@ -63,11 +63,15 @@ public class InstagramUserPhotoCrawler {
 	 */
 	public void crawlUsersPhotoStream(){
 
-		ArrayList<String> userIdsToCrawl = reader.readUserIdInUserTableNotPhotoTable();
+		ArrayList<String> userIdsToCrawl = reader.readUserNeighborsNotCrawlPhoto(InstagramConfig.seedUserId, nSTEP);
+		
+		System.out.println("Total Users: " + userIdsToCrawl.size());
 		
 		for(int i = 0; i < userIdsToCrawl.size(); i++){
 
 			String userId = userIdsToCrawl.get(i);
+			
+			System.out.println(i + ": " + userId);
 
 			//Crawl photo stream and write into table
 			boolean flag = getUserRecentStream(userId);
@@ -104,7 +108,7 @@ public class InstagramUserPhotoCrawler {
 		//LOOP for pages
 		while(api.length() > 0){
 			
-			//Check crawled json page
+			//Check crawled JSON page
 			if(!checker.checkJsonPage(jsonPage, api)){	//check jsonPage, if false
 				return false;
 			}		
@@ -116,6 +120,7 @@ public class InstagramUserPhotoCrawler {
 				return false;
 			}
 
+			//Parse photo stream
 			JSONArray jsonA = jObj.getJSONArray("data");
 			
 			for(int i = 0; i<jsonA.length(); i++){
@@ -124,12 +129,25 @@ public class InstagramUserPhotoCrawler {
 				photo.setUserId(userId);
 				photoList.add(photo);
 				
-			}			
+			}		
+			
+			//Get next page api
+			JSONObject nextObject = jObj.getJSONObject("pagination");
+			if(!nextObject.isNull("next_url"))
+			{ 
+				api = nextObject.getString("next_url");	
+				api = api.replaceAll("access_token=.*?&", "access_token="+accessToken.pickToken()+"&");
+			}else
+			{
+				api = "";
+			}
 		}
 		
 		//WRITE Instagram photo list into table
-		writePhoto2DB();
 		
+		System.out.println("Start write " + photoList.size() + " " + System.currentTimeMillis());
+		writePhoto2DB();
+		System.out.println("End: " + System.currentTimeMillis());
 		return true;
 	}
 	

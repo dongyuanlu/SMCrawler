@@ -88,7 +88,7 @@ public class InstagramToken_1 {
 	}
 	
 	public boolean isSafe(int index){
-		long timeInterval = System.currentTimeMillis() - startTime[index] + 100000;
+		long timeInterval = System.currentTimeMillis() - startTime[index] - 100000;
 		
 		if(timeInterval >= HOUR){
 			return true;
