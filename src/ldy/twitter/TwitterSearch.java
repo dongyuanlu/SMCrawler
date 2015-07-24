@@ -3,6 +3,7 @@ package ldy.twitter;
 import java.util.List;
 
 import twitter4j.Query;
+import twitter4j.Query.ResultType;
 import twitter4j.QueryResult;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -39,14 +40,21 @@ public class TwitterSearch {
 	
 	
 	public void searchInstagramPost(){
-		Query q = new Query("Victoria's first set of diamond earrings.");
+		Query q = new Query();
+		q.setCount(1);
+		q.setQuery("\"5gFz6lD2m9\"");
+		q.setResultType(Query.MIXED);
+		
+		System.out.println(q.toString());
+		
 
 		try {
 			QueryResult searchResult = twitter.search(q);
+			System.out.println(searchResult.toString());
 			List<Status> results = searchResult.getTweets();
 			for(int i = 0; i < results.size(); i++){
 				Status tweet = results.get(i);
-				System.out.println(tweet.toString());
+				System.out.println(tweet.getText() + "\t" + tweet.getSource() + "\t" + tweet.getUser().getScreenName());
 			}
 			
 			

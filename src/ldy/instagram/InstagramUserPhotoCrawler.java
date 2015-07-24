@@ -22,7 +22,7 @@ import ldy.instagram.InstagramPhoto;
  *
  */
 public class InstagramUserPhotoCrawler {
-	private int nSTEP = 1;	//the distance of neighbors from seed user
+	private int nSTEP = 2;	//the distance of neighbors from seed user
 
 	private static InstagramToken_3 accessToken;	//select the second accessToken
 
