@@ -26,7 +26,7 @@ public class InstagramToken_2 {
 		countTokens = new int[tokens.length];
 		startTime = new long[tokens.length];
 		
-		currentIndex = 1;
+		currentIndex = 0;
 		startTime[currentIndex] = System.currentTimeMillis();
 
 	}

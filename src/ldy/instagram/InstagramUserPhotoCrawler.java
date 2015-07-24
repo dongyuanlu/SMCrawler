@@ -103,10 +103,11 @@ public class InstagramUserPhotoCrawler {
 //		long latestPhotoTimestamp = getLatestTimestamp(userId);
 		String api = InstagramConfig.userRecentBaseUrl + userId + "/media/recent/?access_token=" + accessToken.pickToken()
 				+ "&count=40";
-		String jsonPage = PageCrawler.readUrl(api);
+		
 		
 		//LOOP for pages
 		while(api.length() > 0){
+			String jsonPage = PageCrawler.readUrl(api);
 			
 			//Check crawled JSON page
 			if(!checker.checkJsonPage(jsonPage, api)){	//check jsonPage, if false
