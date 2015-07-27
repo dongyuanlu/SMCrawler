@@ -26,7 +26,7 @@ public class InstagramToken_1 {
 		countTokens = new int[tokens.length];
 		startTime = new long[tokens.length];
 		
-		currentIndex = 1;
+		currentIndex = 0;
 		startTime[currentIndex] = System.currentTimeMillis();
 
 	}
@@ -114,7 +114,7 @@ public class InstagramToken_1 {
 	public void sleep(long currentTime){
 		
 		try {
-			long time = HOUR - (System.currentTimeMillis() - currentTime);
+			long time = HOUR - (System.currentTimeMillis() - currentTime) + 100000;
 			System.err.println("sleep for " + time + ": for security");
 			Thread.sleep(time);
 		} catch (InterruptedException e) {
