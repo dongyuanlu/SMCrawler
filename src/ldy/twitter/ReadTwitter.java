@@ -31,6 +31,7 @@ public class ReadTwitter {
 	 * @param username
 	 * @return latest tweet id;
 	 * 			IF no tweets, return 0
+	 * 
 	 */
 	public long readLatestIdOfTweets(String username){
 		long sinceId = 0;

@@ -1,6 +1,8 @@
 package ldy.twitter;
 
 public class TwitterConfig {
+	
+	public static String accessTokenConfig = "data/accesstoken.config";
 
 	//***************************************************
 	//DATABASE tables
