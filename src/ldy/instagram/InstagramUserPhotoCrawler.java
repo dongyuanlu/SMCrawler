@@ -147,7 +147,12 @@ public class InstagramUserPhotoCrawler {
 		//WRITE Instagram photo list into table
 		
 		System.out.println("Start write " + photoList.size() + " " + System.currentTimeMillis());
-		writePhoto2DB();
+		if(photoList.size() == 0){
+			writer.writeBadUser2DB(userId, InstagramConfig.badUserTable, "0photo");
+		}else{
+			writePhoto2DB();
+		}
+		
 		System.out.println("End: " + System.currentTimeMillis());
 		return true;
 	}
