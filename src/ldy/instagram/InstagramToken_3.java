@@ -15,7 +15,7 @@ public class InstagramToken_3 {
 	private long[] startTime;
 	
 
-	private int LIMIT = 5000; //instagram visit limit, 5000 / hour
+	private int LIMIT = 4900; //instagram visit limit, 5000 / hour
 	private long HOUR = 3600000;	//less one hour in milliseconds
 
 	

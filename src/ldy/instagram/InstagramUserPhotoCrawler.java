@@ -133,15 +133,22 @@ public class InstagramUserPhotoCrawler {
 			}		
 			
 			//Get next page api
-			JSONObject nextObject = jObj.getJSONObject("pagination");
-			if(!nextObject.isNull("next_url"))
-			{ 
-				api = nextObject.getString("next_url");	
-				api = api.replaceAll("access_token=.*?&", "access_token="+accessToken.pickToken()+"&");
-			}else
-			{
+			if(jObj.isNull("pagination")){
 				api = "";
 			}
+			else
+			{
+				JSONObject nextObject = jObj.getJSONObject("pagination");
+				if(!nextObject.isNull("next_url"))
+				{ 
+					api = nextObject.getString("next_url");	
+					api = api.replaceAll("access_token=.*?&", "access_token="+accessToken.pickToken()+"&");
+				}else
+				{
+					api = "";
+				}
+			}
+			
 		}
 		
 		//WRITE Instagram photo list into table
