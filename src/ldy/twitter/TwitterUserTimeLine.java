@@ -1,21 +1,11 @@
 package ldy.twitter;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.TimeZone;
-
 import ldy.instagram.InstagramConfig;
-import ldy.twitter.OAuth4J;
 import twitter4j.GeoLocation;
 import twitter4j.HashtagEntity;
 import twitter4j.MediaEntity;
@@ -25,11 +15,9 @@ import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
 import twitter4j.URLEntity;
 import twitter4j.User;
 import twitter4j.UserMentionEntity;
-import twitter4j.auth.AccessToken;
 import util.SQLUtil;
 
 public class TwitterUserTimeLine {
@@ -37,7 +25,6 @@ public class TwitterUserTimeLine {
 	TwitterUser user;
 	ArrayList<Tweet> tweetList;
 
-	private static TwitterFactory factory;
 	private static Twitter twitter;
 	private SQLUtil sql;
 	ReadTwitter reader;
@@ -49,18 +36,10 @@ public class TwitterUserTimeLine {
 	 */
 	public TwitterUserTimeLine(){
 		
-		tweetList = new ArrayList<>();
-		
-		factory = new TwitterFactory();
-		twitter = factory.getInstance();
-		
-		String[] keys = OAuth4J.loadConsumerKey();
-		twitter.setOAuthConsumer(keys[0], keys[1]);
-		twitter.setOAuthAccessToken(OAuth4J.loadAccessToken());
-		
-		sql = new SQLUtil(InstagramConfig.database);
-		
+		twitter = TwitterInitial.twitter();
+		sql = new SQLUtil(InstagramConfig.database);		
 		reader = new ReadTwitter();
+		
 	}
 	
 	
