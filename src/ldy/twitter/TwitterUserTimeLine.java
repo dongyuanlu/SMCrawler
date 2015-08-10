@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import ldy.instagram.InstagramConfig;
 import twitter4j.GeoLocation;
 import twitter4j.HashtagEntity;
@@ -25,7 +26,8 @@ public class TwitterUserTimeLine {
 	TwitterUser user;
 	ArrayList<Tweet> tweetList;
 
-	private static Twitter twitter;
+	private TwitterInitial twitterIni;
+	private Twitter twitter;
 	private SQLUtil sql;
 	ReadTwitter reader;
 	
@@ -35,8 +37,8 @@ public class TwitterUserTimeLine {
 	 * Constructor
 	 */
 	public TwitterUserTimeLine(){
-		
-		twitter = TwitterInitial.twitter();
+		twitterIni = new TwitterInitial();
+		twitter = twitterIni.twitter();
 		sql = new SQLUtil(InstagramConfig.database);		
 		reader = new ReadTwitter();
 		
@@ -82,6 +84,7 @@ public class TwitterUserTimeLine {
 				ResponseList<Status> statList2 = twitter.getUserTimeline(userName);
 				System.out.println(statList2.size());
 				///////////////////////////////
+				twitterIni.countApi(); //Check API security
 				statList = twitter.getUserTimeline(userName, paging);	//Call Twitter API
 				
 				Iterator<Status> iter = statList.iterator();
@@ -96,8 +99,6 @@ public class TwitterUserTimeLine {
 					}
 				}
 				
-				Thread.sleep(4*1000);	//keep IP security
-
 				paging.setPage(page++);
 				
 			}while(statList.size()>0);
@@ -114,12 +115,7 @@ public class TwitterUserTimeLine {
 			
 			e.printStackTrace();
 			return false;
-		}catch (InterruptedException e) {
-			
-			e.printStackTrace();
-			return false;
 		}
-		
 
 	}
 	

@@ -8,7 +8,7 @@ public class TwitterConfig {
 	//DATABASE tables
 	public static String tweetTable = "twitter_tweet";
 	public static String twitterUserTable = "twitter_user";
-
+	public static String instagramTwitterAlignTable = "ins_twi_align";
 
 	
 	//***************************************************

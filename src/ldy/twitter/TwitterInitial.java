@@ -18,13 +18,22 @@ import twitter4j.auth.AccessToken;
  */
 public class TwitterInitial {
 	
-	private static String accessTokenConfig = TwitterConfig.accessTokenConfig;
+	private String accessTokenConfig = TwitterConfig.accessTokenConfig;
 	
-	private static TwitterFactory factory;
-	private static Twitter twitter;
+	private TwitterFactory factory;
+	private Twitter twitter;
+
+	private int LIMIT = 170;  //limit 180
+	private int QUAT = 900000;  //15mins
+	private int countTokens = 0;
+	private long startTime;
+	
+	public TwitterInitial(){
+		startTime = System.currentTimeMillis();
+	}
 
 	
-	public static Twitter twitter(){
+	public Twitter twitter(){
 		
 		factory = new TwitterFactory();
 		twitter = factory.getInstance();
@@ -36,6 +45,31 @@ public class TwitterInitial {
 
 		return twitter;
 	}
+	
+	
+	/**
+	 * 
+	 * Count visit twitter API, control visiting 
+	 * 
+	 */
+	public void countApi(){
+		
+		if(countTokens < LIMIT)
+		{
+			countTokens++;
+		}
+		else
+		{
+			long timeInterval = System.currentTimeMillis() - startTime - 10000;
+			if(timeInterval > QUAT){
+				countTokens = 0;
+				startTime = System.currentTimeMillis();
+			}else{
+				sleep(startTime);
+			}
+		}
+		
+	}
 
 	
 	
@@ -44,7 +78,7 @@ public class TwitterInitial {
 	 * @param accesstokenConfig
 	 * @return
 	 */
-	public static AccessToken loadAccessToken(){
+	public AccessToken loadAccessToken(){
 		
 		Properties pro = new Properties();
 		
@@ -73,7 +107,7 @@ public class TwitterInitial {
 	 * @param accesstokenConfig
 	 * @return
 	 */
-	public static String[] loadConsumerKey(){
+	public String[] loadConsumerKey(){
 		
 		Properties pro = new Properties();
 		String[] keys = {"",""};
@@ -93,6 +127,19 @@ public class TwitterInitial {
 			
 			e.printStackTrace();
 			return keys;
+		}
+	}
+	
+	
+	public void sleep(long currentTime){
+		
+		try {
+			long time = QUAT - (System.currentTimeMillis() - currentTime);
+			System.err.println("sleep for " + time + ": for security");
+			Thread.sleep(time);
+		} catch (InterruptedException e) {
+
+			e.printStackTrace();
 		}
 	}
 

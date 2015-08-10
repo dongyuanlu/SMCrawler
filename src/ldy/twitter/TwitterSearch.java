@@ -15,10 +15,12 @@ public class TwitterSearch {
 	private static Twitter twitter;
 	
 	private Status tweet;
+	
+	private TwitterInitial twitterIni;
 
 	public TwitterSearch(){
-		
-		twitter = TwitterInitial.twitter();
+		twitterIni = new TwitterInitial();
+		twitter = twitterIni.twitter();
 		tweet = null;
 	}
 	
@@ -44,15 +46,20 @@ public class TwitterSearch {
 		tweet = null;		
 
 		try {
-			QueryResult searchResult = twitter.search(q);
+			twitterIni.countApi();  //check whether API is secure
+			QueryResult searchResult = twitter.search(q);  //call API
 			List<Status> results = searchResult.getTweets();
 			for(int i = 0; i < results.size(); i++){
 				tweet = results.get(i);
 
 				System.out.println(tweet.getText() + "\t" + tweet.getSource() + "\t" + tweet.getUser().getScreenName());
 			
-				if(checkTweet(insLinkId)){
+				if(checkTweet(insLinkId)){	//found corresponding tweet
 					break;
+				}
+				
+				if(i == results.size()-1){ //no corresponding tweet
+					tweet = null;
 				}
 			}
 			
