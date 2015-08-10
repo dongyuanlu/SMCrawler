@@ -14,7 +14,7 @@ import ldy.instagram.ReadInstagramPhoto;
 
 /**
  * 
- * Find twitter account given Instagram photo stream
+ * Find corresponding twitter account given Instagram user id and his photo stream
  * 
  * @author ellen
  *
@@ -40,6 +40,12 @@ public class AlignInstagramTwitter {
 		alignList = new ArrayList<>();
 	}
 	
+	
+	
+	public static void main(String[] args){
+		AlignInstagramTwitter aligner = new AlignInstagramTwitter();
+		aligner.alignAllInstagramToTwitter();
+	}
 	
 	
 	/**
