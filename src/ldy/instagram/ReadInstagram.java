@@ -170,6 +170,31 @@ public class ReadInstagram {
 	}
 	
 	
+	public ArrayList<String> readUserIdFromBadUserTable(String cause1, String cause2){
+		ArrayList<String> alreadyList = new ArrayList<String>();
+		
+		Statement st = sql.getStatement();
+		
+		try {
+			ResultSet rs = st.executeQuery("SELECT DISTINCT userid from " + InstagramConfig.badUserTable 
+							+ " WHERE cause='" + cause1 + "' OR cause='" + cause2 + "'");
+			
+			
+			while(rs.next()){
+				String userName = rs.getString("userid");
+				alreadyList.add(userName);
+			}
+			
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+		
+		return alreadyList;
+	
+	}
+
+	
 	/**
 	 * 
 	 * @return userId list from intagram_user table, whose relations not crawled
@@ -274,7 +299,7 @@ public class ReadInstagram {
 	public ArrayList<String> readUserNeighborsNotCrawlPhoto(String userId, int step){
 		ArrayList<String> neighborList = readUserNeighbors(userId, step);
 		ArrayList<String> photoUserList = readUserIdFromPhotoTable();
-		ArrayList<String> badUserList = readUserIdFromBadUserTable("photostream");
+		ArrayList<String> badUserList = readUserIdFromBadUserTable("photostream","0photo");
 
 		ArrayList<String> list = new ArrayList<String>();
 		

@@ -31,13 +31,15 @@ public class AlignInstagramTwitter {
 	private ArrayList<AlignUnit> alignList;
 
 	public AlignInstagramTwitter(){
-		instagramUserIdList = insReader.readUserNeighbors(InstagramConfig.seedUserId, 1);
-		
 		insReader = new ReadInstagram();
 		insPhotoReader = new ReadInstagramPhoto();
 		searcher = new TwitterSearch();
 		
 		alignList = new ArrayList<>();
+//		instagramUserIdList = insReader.readUserNeighbors(InstagramConfig.seedUserId, 1);
+		instagramUserIdList = new ArrayList();
+		instagramUserIdList.add("1446381698");
+		
 	}
 	
 	
@@ -85,7 +87,12 @@ public class AlignInstagramTwitter {
 		for(int i = 0; i < photoList.size(); i++)
 		{
 			InstagramPhoto photo = photoList.get(i);
-			String linkId = photo.getLink().substring(photo.getLink().lastIndexOf("/")+1);
+			
+			String link = photo.getLink();
+			String linkId = link.substring(link.indexOf("/p/")+3,link.length()-1);
+			if(!linkId.equals("0GU-VYGoyT")){
+				continue;
+			}
 			Status tweet = searcher.searchInstagramId(linkId);
 			if(tweet != null){
 				align = new AlignUnit();

@@ -15,19 +15,21 @@ public class InstagramToken_4 {
 	private long[] startTime;
 	
 
-	private int LIMIT = 4900; //instagram visit limit, 5000 / hour
+	private int LIMIT = 4950; //instagram visit limit, 5000 / hour
 	private long HOUR = 3600000;	//less one hour in milliseconds
 
 	
 	private int currentIndex;
-	
+	private boolean flag;
+
 	public InstagramToken_4(){
 	
 		countTokens = new int[tokens.length];
 		startTime = new long[tokens.length];
 		
 		currentIndex = 0;
-		startTime[currentIndex] = System.currentTimeMillis();
+	//	startTime[currentIndex] = System.currentTimeMillis();
+		flag = false;
 
 	}
 	
@@ -40,6 +42,10 @@ public class InstagramToken_4 {
 	 * @return
 	 */
 	public String pickToken(){
+		if(!flag){
+			startTime[currentIndex] = System.currentTimeMillis();
+			flag = true;
+		}
 		
 		if(countTokens[currentIndex] < LIMIT)
 		{
