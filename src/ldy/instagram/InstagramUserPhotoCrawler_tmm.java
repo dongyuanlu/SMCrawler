@@ -24,7 +24,7 @@ import ldy.instagram.InstagramPhoto;
 public class InstagramUserPhotoCrawler_tmm {
 	private int nSTEP = 2;	//the distance of neighbors from seed user
 
-	private static InstagramToken_5 accessToken;	//select the second accessToken
+	private static InstagramToken_4 accessToken;	//select the second accessToken
 
 	private ArrayList<InstagramPhoto> photoList;
 	
@@ -42,7 +42,7 @@ public class InstagramUserPhotoCrawler_tmm {
 		reader = new ReadInstagram();
 		writer = new WriteInstagram();
 		checker = new CheckJSONPage();
-		accessToken = new InstagramToken_5();	//select the second accessToken
+		accessToken = new InstagramToken_4();	//select the second accessToken
 
 	}
 	
@@ -68,7 +68,7 @@ public class InstagramUserPhotoCrawler_tmm {
 		
 		System.out.println("Total Users: " + userIdsToCrawl.size());
 		
-		for(int i = userIdsToCrawl.size()-1; i>=4000; i--){
+		for(int i = 0; i<4000; i++){
 
 			String userId = userIdsToCrawl.get(i);
 			

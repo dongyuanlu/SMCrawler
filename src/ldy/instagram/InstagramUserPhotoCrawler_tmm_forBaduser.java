@@ -21,10 +21,10 @@ import ldy.instagram.InstagramPhoto;
  * @author ellen
  *
  */
-public class InstagramUserPhotoCrawler_tmm2 {
-	private int nSTEP = 2;	//the distance of neighbors from seed user
+public class InstagramUserPhotoCrawler_tmm_forBaduser {
+//	private int nSTEP = 2;	//the distance of neighbors from seed user
 
-	private static InstagramToken_4 accessToken;	//select the second accessToken
+	private static InstagramToken_1 accessToken;	//select the second accessToken
 
 	private ArrayList<InstagramPhoto> photoList;
 	
@@ -37,18 +37,18 @@ public class InstagramUserPhotoCrawler_tmm2 {
 	/**
 	 * Constructor
 	 */
-	public InstagramUserPhotoCrawler_tmm2(){
+	public InstagramUserPhotoCrawler_tmm_forBaduser(){
 		this.photoList = new ArrayList<>();
 		reader = new ReadInstagram();
 		writer = new WriteInstagram();
 		checker = new CheckJSONPage();
-		accessToken = new InstagramToken_4();	//select the second accessToken
+		accessToken = new InstagramToken_1();	//select the second accessToken
 
 	}
 	
 	
 	public static void main(String[] args){
-		InstagramUserPhotoCrawler_tmm2 photoCrawler = new InstagramUserPhotoCrawler_tmm2();
+		InstagramUserPhotoCrawler_tmm_forBaduser photoCrawler = new InstagramUserPhotoCrawler_tmm_forBaduser();
 		photoCrawler.crawlUsersPhotoStream();
 	}
 	
@@ -68,7 +68,7 @@ public class InstagramUserPhotoCrawler_tmm2 {
 		
 		System.out.println("Total Users: " + userIdsToCrawl.size());
 		
-		for(int i = 4000; i<userIdsToCrawl.size(); i++){
+		for(int i =0; i<userIdsToCrawl.size(); i++){
 
 			String userId = userIdsToCrawl.get(i);
 			
@@ -80,6 +80,8 @@ public class InstagramUserPhotoCrawler_tmm2 {
 			if(!flag){ //if failed
 				writer.writeBadUser2DB(userId, "instagram_photo_tmm_baduser", "photostream");
 				
+			}else{
+				writer.deleteBadUser(userId, "instagram_photo_tmm_baduser");
 			}
 		}
 	}
@@ -393,12 +395,13 @@ public class InstagramUserPhotoCrawler_tmm2 {
 	 */
 	public ArrayList<String> getFlickrInstagramUserList(){
 		ArrayList<String> userList = new ArrayList<String>();
-		String query = "SELECT instagram_id FROM flickr_instagram_userlist WHERE 1";
+//		String query = "SELECT instagram_id FROM flickr_instagram_userlist WHERE 1";
+		String query = "SELECT userid FROM instagram_photo_tmm_baduser WHERE 1";
 		Statement st = sql.getStatement();
 		try {
 			ResultSet rs = st.executeQuery(query);
 			while(rs.next()){
-				String userId = rs.getString("instagram_id");
+				String userId = rs.getString("userid");
 				userList.add(userId);
 			}
 			

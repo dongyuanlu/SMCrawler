@@ -38,4 +38,25 @@ public class WriteInstagram {
 			
 	}
 
+	
+	/**
+	 * 
+	 * Delete userId from baduser table
+	 * 
+	 * @param userId
+	 * @param tableName
+	 */
+	public void deleteBadUser(String userId, String tableName){
+		String query = "DELETE FROM " + tableName + " WHERE userId='" + userId + "'";
+		Statement st = sql.getStatement();
+		
+		try {
+			st.execute(query);
+			
+			st.close();
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+	}
 }
