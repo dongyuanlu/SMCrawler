@@ -39,7 +39,7 @@ public class CrawlRedditArticle {
 	////Record in list_reddit table /////////
 	private String DOMAIN = "video";                 ///
 	private String CATEGORY = "top_month";                ////t=day
-	private String FLAG = "at20150625120000";     ///
+	private String FLAG = "at20150929110000";     ///
 	/////////////////////////////////////////
 	private int rankIndex = 1;
 

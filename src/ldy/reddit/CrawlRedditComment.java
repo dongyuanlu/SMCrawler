@@ -45,8 +45,8 @@ public class CrawlRedditComment {
 	 */
 	
 	public static void main(String[] args){
-		MyLog log = new MyLog(CrawlRedditComment.class.getName(), "topVideoListJul02");
-		String condition = "WHERE category='top_month' AND domain='video' AND flag='at20150625160000'";
+		MyLog log = new MyLog(CrawlRedditComment.class.getName(), "topVideoListSep29");
+		String condition = "WHERE category='top_month' AND domain='video' AND flag='at20150929110000'";
 		
 		ReadRedditArticle articleReader = new ReadRedditArticle(RedditConfig.listRedditTable,condition);
 		articleReader.readArticleIndexMap();
