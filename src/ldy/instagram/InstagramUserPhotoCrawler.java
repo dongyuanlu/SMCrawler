@@ -383,6 +383,14 @@ public class InstagramUserPhotoCrawler {
 		return timestamp;
 	}
 	
+	
+	public void addPhotoList(ArrayList<InstagramPhoto> list){
+		this.photoList.addAll(list);
+	}
 
 
+	public void clearPhotoList(){
+		this.photoList.clear();
+		
+	}
 }

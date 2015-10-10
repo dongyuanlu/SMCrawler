@@ -113,6 +113,38 @@ public class ReadInstagram {
 		return alreadyList;
 	
 	}
+	
+	
+	/**
+	 * Select a list of users from photoTable under condition
+	 * 
+	 * @param condition
+	 * @return
+	 */
+	public ArrayList<String> readUserIdFromPhotoTable(String condition){
+		ArrayList<String> alreadyList = new ArrayList<String>();
+		
+		Statement st = sql.getStatement();
+		
+		try {
+			ResultSet rs = st.executeQuery("SELECT DISTINCT user_id from " + InstagramConfig.instagramPhotoTable + condition);
+			
+			while(rs.next()){
+				String userName = rs.getString("user_id");
+				alreadyList.add(userName);
+			}
+			
+		} catch (SQLException e) {
+
+			e.printStackTrace();
+		}
+		
+		return alreadyList;
+	
+	}
+	
+	
+	
 
 	
 	/**
