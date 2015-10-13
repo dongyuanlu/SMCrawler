@@ -27,6 +27,11 @@ public class TransferDateBetweenTable {
 //		crawler = new InstagramUserPhotoCrawler();
 	}
 	
+	public static void main(String[] args){
+		TransferDateBetweenTable transfer = new TransferDateBetweenTable();
+		transfer.transferPhotoBetweeenTable();
+	}
+	
 	
 	/**
 	 * Transfer photos from existing table to a new table
@@ -36,11 +41,11 @@ public class TransferDateBetweenTable {
 		tableName = "instagram_photo_usershasphy";
 		
 		ArrayList<String> userList = reader.readUserIdFromPhotoTable(
-				"WHERE user_id in (SELECT distinct user_id FROM instagram.instagram_photo where length(users_in_photo)>0)");
+				" WHERE length(users_in_photo)>0");
 		
 		for(int i = 0; i < userList.size(); i++){
 			String userId = userList.get(i);
-			
+			System.out.println(i);
 			photoList = photoReader.readPhotoStreamOfUser(userId);
 			writePhoto2DB();
 			photoList.clear();
