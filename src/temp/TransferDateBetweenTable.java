@@ -1,7 +1,9 @@
 package temp;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -34,16 +36,16 @@ public class TransferDateBetweenTable {
 	
 	
 	/**
+	 * 
 	 * Transfer photos from existing table to a new table
 	 * 
 	 */
 	public void transferPhotoBetweeenTable(){
 		tableName = "instagram_photo_usershasphy";
 		
-		ArrayList<String> userList = reader.readUserIdFromPhotoTable(
-				" WHERE length(users_in_photo)>0");
+		ArrayList<String> userList = readUserListHashPhy();
 		
-		for(int i = 0; i < userList.size(); i++){
+		for(int i = 0; i < userList.size(); i+=10){//////SAMPLE 
 			String userId = userList.get(i);
 			System.out.println(i);
 			photoList = photoReader.readPhotoStreamOfUser(userId);
@@ -111,5 +113,31 @@ public class TransferDateBetweenTable {
 		}
 	}
 
+	
+	/**
+	 * Read userlist from intagram_user_hasphy
+	 * 
+	 * @return
+	 */
+	public ArrayList<String> readUserListHashPhy(){
+		ArrayList<String> userList = new ArrayList<>();
+		
+		String query = "SELECT * FROM instagram_user_hasphy";
+		Statement st = sql.getStatement();
+		try {
+			ResultSet rs = st.executeQuery(query);
+			
+			while(rs.next()){
+				String userid = rs.getString("user_id");
+				userList.add(userid);
+			}
+			
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+		}
+		
+		return userList;
+	}
 	
 }
