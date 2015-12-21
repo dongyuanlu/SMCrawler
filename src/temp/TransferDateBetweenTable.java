@@ -47,7 +47,7 @@ public class TransferDateBetweenTable {
 		
 		ArrayList<String> userList = readUserListHashPhy();
 		
-		for(int i = 0; i < userList.size(); i+=10){//////SAMPLE 
+		for(int i = 78220; i < userList.size(); i+=10){//////SAMPLE 
 			String userId = userList.get(i);
 			System.out.println(i);
 			photoList = photoReader.readPhotoStreamOfUser(userId);
