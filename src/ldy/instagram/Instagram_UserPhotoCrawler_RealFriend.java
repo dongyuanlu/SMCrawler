@@ -67,7 +67,7 @@ public class Instagram_UserPhotoCrawler_RealFriend {
 	 */
 	public void crawlUsersPhotoStream(){
 
-		ArrayList<String> userIdsToCrawl = reader.readUserNeighborsNotCrawlPhoto(InstagramConfig.seedUserId, nSTEP);
+		ArrayList<String> userIdsToCrawl = getUsersNeedToCrawl();
 		
 		System.out.println("Total Users: " + userIdsToCrawl.size());
 		
@@ -166,7 +166,11 @@ public class Instagram_UserPhotoCrawler_RealFriend {
 	}
 
 	
-	
+	public ArrayList<String> getUsersNeedToCrawl(){
+		
+		ArrayList<String> userIdsToCrawl = new ArrayList<String>();
+		
+	}
 	
 
 }

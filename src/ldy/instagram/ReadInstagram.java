@@ -294,7 +294,7 @@ public class ReadInstagram {
 	
 	/**
 	 * 
-	 * READ seed user's step neighbors, who need crawling relations
+	 * READ seed user's step neighbors, who need crawling RELATIONs
 	 * 
 	 * @param userId
 	 * @param step
@@ -322,7 +322,7 @@ public class ReadInstagram {
 
 	/**
 	 * 
-	 * READ userId's step neighbors whose photos have not crawled
+	 * READ userId's step neighbors whose PHOTOs have not crawled
 	 * 
 	 * @param userId
 	 * @param step
