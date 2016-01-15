@@ -10,7 +10,7 @@ package ldy.instagram;
 public class InstagramToken_3 {
 	
 	//ONLY USE 3rd, 4th tokens in InstagramConfig/////
-	private String[] tokens = {InstagramConfig.accessTokens[4]};
+	private String[] tokens = {InstagramConfig.accessTokens[3]};//accessToken[4] is abandoned
 	private int[] countTokens;
 	private long[] startTime;
 	

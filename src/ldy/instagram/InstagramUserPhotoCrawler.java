@@ -230,8 +230,10 @@ public class InstagramUserPhotoCrawler {
 		String likes = "";
 		if(!obj.isNull("likes")){
 			JSONObject o = obj.getJSONObject("likes");
-			int count = o.getInt("count");
-			photo.setLikes_count(count);
+			if(!o.isNull("count")){
+				int count = o.getInt("count");
+				photo.setLikes_count(count);
+			}
 			
 			JSONArray array = o.getJSONArray("data");
 			
