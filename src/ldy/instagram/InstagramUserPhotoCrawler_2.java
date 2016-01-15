@@ -24,7 +24,7 @@ import ldy.instagram.InstagramPhoto;
 public class InstagramUserPhotoCrawler_2 {
 	private int nSTEP = 2;	//the distance of neighbors from seed user
 
-	private static InstagramToken_4 accessToken;	//select the second accessToken
+	private static InstagramToken_4 accessToken;	
 
 	private ArrayList<InstagramPhoto> photoList;
 	

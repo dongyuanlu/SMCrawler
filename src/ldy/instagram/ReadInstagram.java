@@ -355,15 +355,16 @@ public class ReadInstagram {
 	/**
 	 * 
 	 * Read userId's neighbors within 'step' distance
+	 * inlcuding followers and followings
 	 * 
 	 * @param userId: seed user id
 	 * @param step: distance between returned neighbors with seed user
 	 * @return
-	 * 		a list of users contains: userId, userId's 'step' distance neighbors
+	 * 		a list of users contains: seedUser, seedUser's 'step' distance neighbors
 	 * 
 	 */
 	public ArrayList<String> readUserNeighbors(String userId, int step){
-		HashMap<String, Integer> neighborMap = new HashMap();
+		HashMap<String, Integer> neighborMap = new HashMap<String, Integer>();
 		HashSet<String> set = new HashSet<>();
 		
 		neighborMap.put(userId, 0);
@@ -392,19 +393,20 @@ public class ReadInstagram {
 
 		}	
 		
-		ArrayList<String> userList = new ArrayList(neighborMap.keySet());
+		ArrayList<String> userList = new ArrayList<String>(neighborMap.keySet());
 		return userList;
 	}
 	
 	/**
 	 * 
 	 * Read userId's first step neighbors in relationTable
+	 * Including followers and followings
 	 * 
 	 * @param userId
 	 * @return
 	 */
 	public ArrayList<String> readUserNeighbors(String userId){
-		ArrayList<String> userList = new ArrayList();
+		ArrayList<String> userList = new ArrayList<String>();
 		
 		String query = "SELECT DISTINCT user2 FROM " + InstagramConfig.instagramRelationTable + " WHERE user1='" + userId + "'";
 		Statement st = sql.getStatement();
