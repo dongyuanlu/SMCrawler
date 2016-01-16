@@ -17,6 +17,12 @@ public class CrawlYoutubeComment {
 	private CheckJSONPage checker;
 	private ArrayList<YoutubeComment> commentList;
 	
+	public static void main(String[] args){
+		CrawlYoutubeComment crawler = new CrawlYoutubeComment();
+		ArrayList<String> videoIdList = new ArrayList<String>();
+		
+	}
+	
 	public CrawlYoutubeComment(){
 		
 		this.accessKey = new YoutubeKey();

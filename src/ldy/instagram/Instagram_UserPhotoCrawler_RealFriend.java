@@ -1,6 +1,7 @@
 package ldy.instagram;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,7 +31,7 @@ public class Instagram_UserPhotoCrawler_RealFriend {
 
 	private ArrayList<InstagramPhoto> photoList;
 	
-	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
+//	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
 	private static ReadInstagram reader;
 	private static WriteInstagram writer;
 	private CheckJSONPage checker;
@@ -41,7 +42,7 @@ public class Instagram_UserPhotoCrawler_RealFriend {
 	//Constructor
 	public Instagram_UserPhotoCrawler_RealFriend(){
 		this.photoList = new ArrayList<>();
-		reader = new ReadInstagram();
+		reader = new ReadInstagram(PHOTOTABLE, BADUSERTABLE);
 		writer = new WriteInstagram();
 		checker = new CheckJSONPage();
 		accessToken = new InstagramToken_1();	//select the second accessToken
@@ -67,7 +68,7 @@ public class Instagram_UserPhotoCrawler_RealFriend {
 	 */
 	public void crawlUsersPhotoStream(){
 
-		ArrayList<String> userIdsToCrawl = getUsersNeedToCrawl();
+		ArrayList<String> userIdsToCrawl = reader.readUserNeighborsNotCrawlPhoto(InstagramConfig.seedUserId, nSTEP);
 		
 		System.out.println("Total Users: " + userIdsToCrawl.size());
 		
@@ -165,12 +166,5 @@ public class Instagram_UserPhotoCrawler_RealFriend {
 		return true;
 	}
 
-	
-	public ArrayList<String> getUsersNeedToCrawl(){
-		
-		ArrayList<String> userIdsToCrawl = new ArrayList<String>();
-		
-	}
-	
 
 }

@@ -20,9 +20,23 @@ import util.SQLUtil;
 public class ReadInstagram {
 	
 	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
-	
+
+	private static String PHOTOTABLE;
+	private static String BADUSERTABLE;
+	private static String USERTABLE;
+	private static String RELATIONTABLE;
+		
 	public ReadInstagram(){
 		
+		PHOTOTABLE = InstagramConfig.instagramPhotoTable;
+		BADUSERTABLE = InstagramConfig.badUserTable;
+		USERTABLE = InstagramConfig.instagramUserTable;
+		RELATIONTABLE = InstagramConfig.instagramRelationTable;
+	}
+	
+	public ReadInstagram(String photoTable, String badUserTable){
+		this.PHOTOTABLE = photoTable;
+		this.BADUSERTABLE = badUserTable;
 	}
 
 	
@@ -34,7 +48,7 @@ public class ReadInstagram {
 	 */
 	public ArrayList<String> readUserIdFromUserTable(){
 		ArrayList<String> userList = new ArrayList();
-		String q = "SELECT id FROM " + InstagramConfig.instagramUserTable + " WHERE 1";
+		String q = "SELECT id FROM " + USERTABLE + " WHERE 1";
 		Statement st = sql.getStatement();
 		
 		try {
@@ -70,7 +84,7 @@ public class ReadInstagram {
 		Statement st = sql.getStatement();
 		
 		try {
-			ResultSet rs = st.executeQuery("SELECT DISTINCT user1 from " + InstagramConfig.instagramRelationTable);
+			ResultSet rs = st.executeQuery("SELECT DISTINCT user1 from " + RELATIONTABLE);
 			
 			while(rs.next()){
 				String userName = rs.getString("user1");
@@ -98,7 +112,7 @@ public class ReadInstagram {
 		Statement st = sql.getStatement();
 		
 		try {
-			ResultSet rs = st.executeQuery("SELECT DISTINCT user_id from " + InstagramConfig.instagramPhotoTable);
+			ResultSet rs = st.executeQuery("SELECT DISTINCT user_id from " + PHOTOTABLE);
 			
 			while(rs.next()){
 				String userName = rs.getString("user_id");
@@ -127,7 +141,7 @@ public class ReadInstagram {
 		Statement st = sql.getStatement();
 		
 		try {
-			ResultSet rs = st.executeQuery("SELECT DISTINCT user_id from " + InstagramConfig.instagramPhotoTable + condition);
+			ResultSet rs = st.executeQuery("SELECT DISTINCT user_id from " + PHOTOTABLE + condition);
 			
 			while(rs.next()){
 				String userName = rs.getString("user_id");
@@ -159,7 +173,7 @@ public class ReadInstagram {
 		Statement st = sql.getStatement();
 		
 		try {
-			ResultSet rs = st.executeQuery("SELECT DISTINCT userid from " + InstagramConfig.badUserTable 
+			ResultSet rs = st.executeQuery("SELECT DISTINCT userid from " + BADUSERTABLE 
 							+ " WHERE cause='following' OR cause='followedby'");
 			
 			
@@ -183,7 +197,7 @@ public class ReadInstagram {
 		Statement st = sql.getStatement();
 		
 		try {
-			ResultSet rs = st.executeQuery("SELECT DISTINCT userid from " + InstagramConfig.badUserTable 
+			ResultSet rs = st.executeQuery("SELECT DISTINCT userid from " + BADUSERTABLE 
 							+ " WHERE cause='" + cause + "'");
 			
 			
@@ -208,7 +222,7 @@ public class ReadInstagram {
 		Statement st = sql.getStatement();
 		
 		try {
-			ResultSet rs = st.executeQuery("SELECT DISTINCT userid from " + InstagramConfig.badUserTable 
+			ResultSet rs = st.executeQuery("SELECT DISTINCT userid from " + BADUSERTABLE 
 							+ " WHERE cause='" + cause1 + "' OR cause='" + cause2 + "'");
 			
 			
@@ -235,8 +249,8 @@ public class ReadInstagram {
 	public ArrayList<String> readUserIdInUserTableNotRelationNotBaduserTable(){
 		ArrayList<String> userList = new ArrayList();
 		String q = "SELECT id FROM " + InstagramConfig.instagramUserTable + " WHERE "
-				+ "id NOT IN (SELECT DISTINCT user1 FROM " + InstagramConfig.instagramRelationTable + ")"
-						+ " AND id NOT IN (SELECT userid FROM " + InstagramConfig.badUserTable + " WHERE cause='following' OR cause='followedby')";
+				+ "id NOT IN (SELECT DISTINCT user1 FROM " + RELATIONTABLE + ")"
+						+ " AND id NOT IN (SELECT userid FROM " + BADUSERTABLE + " WHERE cause='following' OR cause='followedby')";
 		Statement st = sql.getStatement();
 		
 		try {
@@ -267,8 +281,8 @@ public class ReadInstagram {
 	 */
 	public ArrayList<String> readUserIdInUserTableNotPhotoTable(){
 		ArrayList<String> userList = new ArrayList();
-		String q = "SELECT id FROM " + InstagramConfig.instagramUserTable + " WHERE "
-				+ "id NOT IN (SELECT DISTINCT user_id FROM " + InstagramConfig.instagramPhotoTable + ")";
+		String q = "SELECT id FROM " + USERTABLE + " WHERE "
+				+ "id NOT IN (SELECT DISTINCT user_id FROM " + PHOTOTABLE + ")";
 		Statement st = sql.getStatement();
 		
 		try {
@@ -408,7 +422,7 @@ public class ReadInstagram {
 	public ArrayList<String> readUserNeighbors(String userId){
 		ArrayList<String> userList = new ArrayList<String>();
 		
-		String query = "SELECT DISTINCT user2 FROM " + InstagramConfig.instagramRelationTable + " WHERE user1='" + userId + "'";
+		String query = "SELECT DISTINCT user2 FROM " + RELATIONTABLE + " WHERE user1='" + userId + "'";
 		Statement st = sql.getStatement();
 		
 		try {
@@ -439,7 +453,7 @@ public class ReadInstagram {
 	 * @return
 	 */
 	public int countUserInUserTable(){
-		String q = "SELECT count(id) FROM " + InstagramConfig.instagramUserTable + " WHERE 1";
+		String q = "SELECT count(id) FROM " + USERTABLE + " WHERE 1";
 		Statement st = sql.getStatement();
 		try {
 			ResultSet rs = st.executeQuery(q);
