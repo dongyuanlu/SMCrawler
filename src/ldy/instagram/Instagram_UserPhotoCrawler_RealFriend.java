@@ -42,14 +42,16 @@ public class Instagram_UserPhotoCrawler_RealFriend {
 	//Constructor
 	public Instagram_UserPhotoCrawler_RealFriend(){
 		this.photoList = new ArrayList<>();
+		
+		PHOTOTABLE = "instagram_photo_realfriend";
+		BADUSERTABLE = "instagram_photo_realfriend_baduser";
+		
 		reader = new ReadInstagram(PHOTOTABLE, BADUSERTABLE);
 		writer = new WriteInstagram();
 		checker = new CheckJSONPage();
 		accessToken = new InstagramToken_1();	//select the second accessToken
 
-		PHOTOTABLE = "instagram_photo_realfriend";
-		BADUSERTABLE = "instagram_photo_realfriend_baduser";
-	}
+			}
 	
 	public static void main(String[] args) {
 		Instagram_UserPhotoCrawler_RealFriend photoOfRealCrawler = new Instagram_UserPhotoCrawler_RealFriend();

@@ -37,6 +37,8 @@ public class ReadInstagram {
 	public ReadInstagram(String photoTable, String badUserTable){
 		this.PHOTOTABLE = photoTable;
 		this.BADUSERTABLE = badUserTable;
+		this.RELATIONTABLE = InstagramConfig.instagramRelationTable;
+
 	}
 
 	
