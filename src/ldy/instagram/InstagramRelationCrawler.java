@@ -202,6 +202,7 @@ public class InstagramRelationCrawler {
 			{ 
 				url = nextObject.getString("next_url");	
 				url = url.replaceAll("access_token=.*?&", "access_token="+accessToken.pickToken()+"&");
+				try {Thread.sleep(500);} catch (InterruptedException e) {}
 			}else
 			{
 				url = "";
