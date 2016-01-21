@@ -10,14 +10,6 @@ import java.util.Random;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
-
-
-
-
-
-import com.sun.org.apache.bcel.internal.generic.IUSHR;
-
 import util.PageCrawler;
 import util.SQLUtil;
 
@@ -36,7 +28,7 @@ import util.SQLUtil;
 public class InstagramRelationCrawler {
 		
 	private int THRESHOLD = 0;
-	private int nSTEP = 2;	//the distance of neighbors from seed user
+	private int nSTEP = 1;	//the distance of neighbors from seed user
 	
 //	private static Random generator = new Random();
 	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
@@ -59,13 +51,14 @@ public class InstagramRelationCrawler {
 	 */
 	public InstagramRelationCrawler(){
 		this.relationUserList = new ArrayList<>();
-		reader = new ReadInstagram();
-		writer = new WriteInstagram();
-		accessToken = new InstagramToken_1();
-		
 		USERTABLE = "instagram_user_realfriend";
 		RELATIONTABLE = "instagram_relation_realfriend";
 		BADUSERTABLE = "instagram_realfriend_baduser";
+
+		reader = new ReadInstagram("",BADUSERTABLE,USERTABLE,RELATIONTABLE);
+		writer = new WriteInstagram();
+		accessToken = new InstagramToken_1();
+		
 		
 	}
 
