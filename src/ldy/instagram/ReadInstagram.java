@@ -21,10 +21,10 @@ public class ReadInstagram {
 	
 	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
 
-	private static String PHOTOTABLE;
-	private static String BADUSERTABLE;
-	private static String USERTABLE;
-	private static String RELATIONTABLE;
+	private String PHOTOTABLE;
+	private String BADUSERTABLE;
+	private String USERTABLE;
+	private String RELATIONTABLE;
 		
 	public ReadInstagram(){
 		
@@ -34,13 +34,14 @@ public class ReadInstagram {
 		RELATIONTABLE = InstagramConfig.instagramRelationTable;
 	}
 	
-	public ReadInstagram(String photoTable, String badUserTable){
+	public ReadInstagram(String photoTable, String badUserTable, String userTable, String relationTable){
 		this.PHOTOTABLE = photoTable;
 		this.BADUSERTABLE = badUserTable;
-		this.RELATIONTABLE = InstagramConfig.instagramRelationTable;
+		this.USERTABLE = userTable;
+		this.RELATIONTABLE = relationTable;
 
 	}
-
+	
 	
 	/**
 	 * 

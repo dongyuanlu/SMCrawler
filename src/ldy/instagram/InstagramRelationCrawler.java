@@ -15,6 +15,9 @@ import org.json.JSONObject;
 
 
 
+
+import com.sun.org.apache.bcel.internal.generic.IUSHR;
+
 import util.PageCrawler;
 import util.SQLUtil;
 
@@ -41,6 +44,11 @@ public class InstagramRelationCrawler {
 	private static WriteInstagram writer;
 	private static InstagramToken_1 accessToken;
 	
+	private String RELATIONTABLE;
+	private String RELATIONBADUSERTABLE;
+	private String USERTABLE;
+	private String BADUSERTABLE;
+	
 	private ArrayList<String> userIdListToCrawl;
 
 	private ArrayList<InstagramUser> relationUserList;	// follower/followee list
@@ -54,6 +62,10 @@ public class InstagramRelationCrawler {
 		reader = new ReadInstagram();
 		writer = new WriteInstagram();
 		accessToken = new InstagramToken_1();
+		
+		USERTABLE = "instagram_user_realfriend";
+		RELATIONTABLE = "instagram_relation_realfriend";
+		BADUSERTABLE = "instagram_realfriend_baduser";
 		
 	}
 
@@ -85,10 +97,9 @@ public class InstagramRelationCrawler {
 				String userId = userIdListToCrawl.get(i);
 				System.out.println(userId);
 				
+				//******Crawl followings and followers of current user********//
 				getRelationOfUser(userId);
 
-				//Rest 1s for API limit
-//				try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
 			}
 			
 		//until less than THRESHOLD newly users
@@ -100,8 +111,8 @@ public class InstagramRelationCrawler {
 	
 	/**
 	 * Given userid
-	 * 1. Crawl user's followings and followees
-	 * 2. Write newly followings & followees into instagram_user table
+	 * 1. Crawl user's followings and followers
+	 * 2. Write newly followings & followers into instagram_user table
 	 * 3. Write user-following/followedby relations into instagram_relation table
 	 * 
 	 * If failed, write userId into instagram_baduser table 
@@ -113,37 +124,41 @@ public class InstagramRelationCrawler {
 		String apiUrl = "https://api.instagram.com/v1/users/" + userId + "/";
 		
 		//*********************************
-		//GET user1 follow user2
+		//GET user1 follow user2: following
 		
 		String followingAPI = apiUrl + "follows?count=100&access_token=";
 		relationUserList.clear();	//clear relation user list
 		
-		boolean flag_ing = getRelationUserList(followingAPI);	//get current user's followings
+		//*****Crawl followings of current user****///////
+		boolean flag_ing = getRelationUserList(followingAPI);	
+		
+		//If failed, write current userid into baduser table
 		if(!flag_ing){
-			writer.writeBadUser2DB(userId, InstagramConfig.badUserTable, "following");
+			writer.writeBadUser2DB(userId, RELATIONBADUSERTABLE, "following");
 		}
+		//If successful, write user1_user2_following into relation table;
+		//write news users into usertable
 		else{
 			System.out.println("start following " + relationUserList.size() + " " + System.currentTimeMillis());
-			writeUser2DB(relationUserList, InstagramConfig.instagramUserTable);
-			System.out.println("mid: " + System.currentTimeMillis());
-			writeRelation2DB(userId, relationUserList, InstagramConfig.instagramRelationTable, "following");
+			writeUser2DB(relationUserList, USERTABLE);
+			writeRelation2DB(userId, relationUserList, RELATIONTABLE, "following");
 			System.out.println("end: " + System.currentTimeMillis());
 		}
 		
 		//*********************************
-		//GET user1 followed by user2
+		//GET user1 followed by user2: followedby
 		
 		String followedbyAPI = apiUrl + "followed-by?count=100&access_token=";
 		relationUserList.clear();	//clear relation user list
 		
 		boolean flag_edby = getRelationUserList(followedbyAPI);	//get current user's followed by users
 		if(!flag_edby){
-			writer.writeBadUser2DB(userId, InstagramConfig.badUserTable, "followedby");
+			writer.writeBadUser2DB(userId, RELATIONBADUSERTABLE, "followedby");
 		}
 		else{
 			System.out.println("start followedby " + relationUserList.size() + " " + System.currentTimeMillis());
-			writeUser2DB(relationUserList, InstagramConfig.instagramUserTable);
-			writeRelation2DB(userId, relationUserList, InstagramConfig.instagramRelationTable, "followedby");
+			writeUser2DB(relationUserList, USERTABLE);
+			writeRelation2DB(userId, relationUserList, RELATIONTABLE, "followedby");
 			System.out.println("end: " + System.currentTimeMillis());
 		}
 		

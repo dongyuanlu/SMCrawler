@@ -38,15 +38,17 @@ public class Instagram_UserPhotoCrawler_RealFriend {
 	
 	private String PHOTOTABLE;
 	private String BADUSERTABLE;
+	private String RELATIONTABLE;
 	
 	//Constructor
 	public Instagram_UserPhotoCrawler_RealFriend(){
 		this.photoList = new ArrayList<>();
 		
 		PHOTOTABLE = "instagram_photo_realfriend";
-		BADUSERTABLE = "instagram_photo_realfriend_baduser";
+		BADUSERTABLE = "instagram_realfriend_baduser";
+		RELATIONTABLE = InstagramConfig.instagramRelationTable;
 		
-		reader = new ReadInstagram(PHOTOTABLE, BADUSERTABLE);
+		reader = new ReadInstagram(PHOTOTABLE, BADUSERTABLE,"",RELATIONTABLE);
 		writer = new WriteInstagram();
 		checker = new CheckJSONPage();
 		accessToken = new InstagramToken_1();	//select the second accessToken
