@@ -127,7 +127,7 @@ public class InstagramRelationCrawler {
 		
 		//If failed, write current userid into baduser table
 		if(!flag_ing){
-			writer.writeBadUser2DB(userId, RELATIONBADUSERTABLE, "following");
+			writer.writeBadUser2DB(userId, BADUSERTABLE, "following");
 		}
 		//If successful, write user1_user2_following into relation table;
 		//write news users into usertable
@@ -146,7 +146,7 @@ public class InstagramRelationCrawler {
 		
 		boolean flag_edby = getRelationUserList(followedbyAPI);	//get current user's followed by users
 		if(!flag_edby){
-			writer.writeBadUser2DB(userId, RELATIONBADUSERTABLE, "followedby");
+			writer.writeBadUser2DB(userId, BADUSERTABLE, "followedby");
 		}
 		else{
 			System.out.println("start followedby " + relationUserList.size() + " " + System.currentTimeMillis());
