@@ -174,14 +174,24 @@ public class InstagramRelationCrawler {
 	public boolean getRelationUserList(String apiUrl){
 		String url = apiUrl  + accessToken.pickToken();
 		
+		boolean firstPageFlag = true;
+		
 		while(url.length() > 0){
 			//Crawl json page and json object
 			String jsonPage = PageCrawler.readUrl(url);
 						
 			if(!checkJsonPage(jsonPage, url)){	//check jsonPage, if false
-				return false;
+				//if this is the first page, return false
+				if(firstPageFlag){
+					return false;
+				}
+				else//if not the first page, re-crawl current page;
+				{
+					try {Thread.sleep(1500);} catch (InterruptedException e) {}
+					continue;
+				}
 			}
-
+			
 			JSONObject pageObject = new JSONObject(jsonPage);
 			
 			//Check status code
@@ -202,7 +212,8 @@ public class InstagramRelationCrawler {
 			//Get followList from next page if there is any
 			JSONObject nextObject = pageObject.getJSONObject("pagination");
 			if(!nextObject.isNull("next_url"))
-			{ 
+			{
+				firstPageFlag = false;
 				url = nextObject.getString("next_url");	
 				url = url.replaceAll("access_token=.*?&", "access_token="+accessToken.pickToken()+"&");
 				try {Thread.sleep(500);} catch (InterruptedException e) {}
