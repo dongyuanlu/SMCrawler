@@ -82,8 +82,8 @@ public class InstagramRelationCrawler {
 		//Iteratively crawl the relations of n step neighbors of seed user
 		//whose relations has not been crawled
 		do{
-			userIdListToCrawl= reader.readUserNeighborsNotCrawlRelation(InstagramConfig.seedUserId, nSTEP);
-			
+		//	userIdListToCrawl= reader.readUserNeighborsNotCrawlRelation(InstagramConfig.seedUserId, nSTEP);
+			userIdListToCrawl = reader.readUserIdFromBadUserTable();
 			System.out.println("total number: " + userIdListToCrawl.size());
 			//Loop for current userList
 			for(int i = 0; i < userIdListToCrawl.size(); i++){
@@ -155,6 +155,9 @@ public class InstagramRelationCrawler {
 			System.out.println("end: " + System.currentTimeMillis());
 		}
 		
+		if(flag_ing && flag_edby){
+			writer.deleteBadUser(userId, BADUSERTABLE);
+		}
 	}
 	
 	

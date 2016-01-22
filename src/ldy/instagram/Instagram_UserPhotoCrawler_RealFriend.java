@@ -27,7 +27,7 @@ public class Instagram_UserPhotoCrawler_RealFriend {
 	
 	private int nSTEP = 1;	//the distance of neighbors from seed user
 
-	private static InstagramToken_1 accessToken;	//select the second accessToken
+	private static InstagramToken_5 accessToken;	//select the second accessToken
 
 	private ArrayList<InstagramPhoto> photoList;
 	
@@ -51,7 +51,7 @@ public class Instagram_UserPhotoCrawler_RealFriend {
 		reader = new ReadInstagram(PHOTOTABLE, BADUSERTABLE,"",RELATIONTABLE);
 		writer = new WriteInstagram();
 		checker = new CheckJSONPage();
-		accessToken = new InstagramToken_1();	//select the second accessToken
+		accessToken = new InstagramToken_5();	//select the second accessToken
 
 			}
 	
@@ -72,8 +72,8 @@ public class Instagram_UserPhotoCrawler_RealFriend {
 	 */
 	public void crawlUsersPhotoStream(){
 
-		ArrayList<String> userIdsToCrawl = reader.readUserNeighborsNotCrawlPhoto(InstagramConfig.seedUserId, nSTEP);
-		
+	//	ArrayList<String> userIdsToCrawl = reader.readUserNeighborsNotCrawlPhoto(InstagramConfig.seedUserId, nSTEP);
+		ArrayList<String> userIdsToCrawl = reader.readUserIdFromBadUserTable("photostream");
 		System.out.println("Total Users: " + userIdsToCrawl.size());
 		
 		for(int i = 0; i<userIdsToCrawl.size(); i++){
@@ -88,6 +88,10 @@ public class Instagram_UserPhotoCrawler_RealFriend {
 			if(!flag){ //if failed
 				writer.writeBadUser2DB(userId, BADUSERTABLE, "photostream");
 				
+			}
+			else
+			{
+				writer.deleteBadUser(userId, BADUSERTABLE);
 			}
 		}
 	}
