@@ -10,14 +10,9 @@ import java.util.Random;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-
-
-
-
-
 import util.PageCrawler;
 import util.SQLUtil;
-import util.WriteArrayList2File;
+
 
 
 /**
@@ -30,16 +25,20 @@ import util.WriteArrayList2File;
  * @author Administrator
  *
  */
-public class InstagramRelationCrawlerCopy {
+public class InstagramRelationCrawlerCopy2 {
 		
 	private int THRESHOLD = 0;
-	private int nSTEP = 2;	//the distance of neighbors from seed user
+	private int nSTEP = 1;	//the distance of neighbors from seed user
 	
 //	private static Random generator = new Random();
 	private static SQLUtil sql = new SQLUtil(InstagramConfig.database);
 	private static ReadInstagram reader;
 	private static WriteInstagram writer;
-	private static InstagramToken_2 accessToken;	//select the second accessToken
+	private static InstagramToken_2 accessToken;
+	
+	private String RELATIONTABLE;
+	private String USERTABLE;
+	private String BADUSERTABLE;
 	
 	private ArrayList<String> userIdListToCrawl;
 
@@ -49,11 +48,16 @@ public class InstagramRelationCrawlerCopy {
 	/**
 	 * Constructor
 	 */
-	public InstagramRelationCrawlerCopy(){
+	public InstagramRelationCrawlerCopy2(){
 		this.relationUserList = new ArrayList<>();
-		reader = new ReadInstagram();
+		USERTABLE = "instagram_user_realfriend";
+		RELATIONTABLE = "instagram_relation_realfriend";
+		BADUSERTABLE = "instagram_realfriend_baduser";
+
+		reader = new ReadInstagram("",BADUSERTABLE,USERTABLE,RELATIONTABLE);
 		writer = new WriteInstagram();
-		accessToken = new InstagramToken_2();	//select the second accessToken
+		accessToken = new InstagramToken_2();
+		
 		
 	}
 
@@ -61,7 +65,7 @@ public class InstagramRelationCrawlerCopy {
 	
 	public static void main(String[] args){
 
-		InstagramRelationCrawlerCopy crawler = new InstagramRelationCrawlerCopy();
+		InstagramRelationCrawlerCopy2 crawler = new InstagramRelationCrawlerCopy2();
 		crawler.evolveCrawling();
 		
 	}
@@ -77,18 +81,17 @@ public class InstagramRelationCrawlerCopy {
 		//Iteratively crawl the relations of n step neighbors of seed user
 		//whose relations has not been crawled
 		do{
-			userIdListToCrawl= reader.readUserNeighborsNotCrawlRelation(InstagramConfig.seedUserId, nSTEP);
-			
+		//	userIdListToCrawl= reader.readUserNeighborsNotCrawlRelation(InstagramConfig.seedUserId, nSTEP);
+			userIdListToCrawl = reader.readUserIdFromBadUserTable();
 			System.out.println("total number: " + userIdListToCrawl.size());
 			//Loop for current userList
-			for(int i = userIdListToCrawl.size()-1; i >0; i--){
+			for(int i = userIdListToCrawl.size()-1; i > 0; i--){
 				String userId = userIdListToCrawl.get(i);
 				System.out.println(userId);
 				
+				//******Crawl followings and followers of current user********//
 				getRelationOfUser(userId);
 
-				//Rest 1s for API limit
-//				try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
 			}
 			
 		//until less than THRESHOLD newly users
@@ -100,8 +103,8 @@ public class InstagramRelationCrawlerCopy {
 	
 	/**
 	 * Given userid
-	 * 1. Crawl user's followings and followees
-	 * 2. Write newly followings & followees into instagram_user table
+	 * 1. Crawl user's followings and followers
+	 * 2. Write newly followings & followers into instagram_user table
 	 * 3. Write user-following/followedby relations into instagram_relation table
 	 * 
 	 * If failed, write userId into instagram_baduser table 
@@ -113,40 +116,47 @@ public class InstagramRelationCrawlerCopy {
 		String apiUrl = "https://api.instagram.com/v1/users/" + userId + "/";
 		
 		//*********************************
-		//GET user1 follow user2
+		//GET user1 follow user2: following
 		
 		String followingAPI = apiUrl + "follows?count=100&access_token=";
 		relationUserList.clear();	//clear relation user list
 		
-		boolean flag_ing = getRelationUserList(followingAPI);	//get current user's followings
+		//*****Crawl followings of current user****///////
+		boolean flag_ing = getRelationUserList(followingAPI);	
+		
+		//If failed, write current userid into baduser table
 		if(!flag_ing){
-			writer.writeBadUser2DB(userId, InstagramConfig.badUserTable, "following");
+			writer.writeBadUser2DB(userId, BADUSERTABLE, "following");
 		}
+		//If successful, write user1_user2_following into relation table;
+		//write news users into usertable
 		else{
 			System.out.println("start following " + relationUserList.size() + " " + System.currentTimeMillis());
-			writeUser2DB(relationUserList, InstagramConfig.instagramUserTable);
-			System.out.println("mid: " + System.currentTimeMillis());
-			writeRelation2DB(userId, relationUserList, InstagramConfig.instagramRelationTable, "following");
+			writeUser2DB(relationUserList, USERTABLE);
+			writeRelation2DB(userId, relationUserList, RELATIONTABLE, "following");
 			System.out.println("end: " + System.currentTimeMillis());
 		}
 		
 		//*********************************
-		//GET user1 followed by user2
+		//GET user1 followed by user2: followedby
 		
 		String followedbyAPI = apiUrl + "followed-by?count=100&access_token=";
 		relationUserList.clear();	//clear relation user list
 		
 		boolean flag_edby = getRelationUserList(followedbyAPI);	//get current user's followed by users
 		if(!flag_edby){
-			writer.writeBadUser2DB(userId, InstagramConfig.badUserTable, "followedby");
+			writer.writeBadUser2DB(userId, BADUSERTABLE, "followedby");
 		}
 		else{
 			System.out.println("start followedby " + relationUserList.size() + " " + System.currentTimeMillis());
-			writeUser2DB(relationUserList, InstagramConfig.instagramUserTable);
-			writeRelation2DB(userId, relationUserList, InstagramConfig.instagramRelationTable, "followedby");
+			writeUser2DB(relationUserList, USERTABLE);
+			writeRelation2DB(userId, relationUserList, RELATIONTABLE, "followedby");
 			System.out.println("end: " + System.currentTimeMillis());
 		}
 		
+		if(flag_ing && flag_edby){
+			writer.deleteBadUser(userId, BADUSERTABLE);
+		}
 	}
 	
 	
@@ -163,14 +173,24 @@ public class InstagramRelationCrawlerCopy {
 	public boolean getRelationUserList(String apiUrl){
 		String url = apiUrl  + accessToken.pickToken();
 		
+		boolean firstPageFlag = true;
+		
 		while(url.length() > 0){
 			//Crawl json page and json object
 			String jsonPage = PageCrawler.readUrl(url);
 						
 			if(!checkJsonPage(jsonPage, url)){	//check jsonPage, if false
-				return false;
+				//if this is the first page, return false
+				if(firstPageFlag){
+					return false;
+				}
+				else//if not the first page, re-crawl current page;
+				{
+					try {Thread.sleep(1500);} catch (InterruptedException e) {}
+					continue;
+				}
 			}
-
+			
 			JSONObject pageObject = new JSONObject(jsonPage);
 			
 			//Check status code
@@ -191,9 +211,11 @@ public class InstagramRelationCrawlerCopy {
 			//Get followList from next page if there is any
 			JSONObject nextObject = pageObject.getJSONObject("pagination");
 			if(!nextObject.isNull("next_url"))
-			{ 
+			{
+				firstPageFlag = false;
 				url = nextObject.getString("next_url");	
 				url = url.replaceAll("access_token=.*?&", "access_token="+accessToken.pickToken()+"&");
+				try {Thread.sleep(500);} catch (InterruptedException e) {}
 			}else
 			{
 				url = "";
