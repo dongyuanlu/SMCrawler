@@ -37,7 +37,6 @@ public class InstagramRelationCrawler {
 	private static InstagramToken_1 accessToken;
 	
 	private String RELATIONTABLE;
-	private String RELATIONBADUSERTABLE;
 	private String USERTABLE;
 	private String BADUSERTABLE;
 	
@@ -82,13 +81,13 @@ public class InstagramRelationCrawler {
 		//Iteratively crawl the relations of n step neighbors of seed user
 		//whose relations has not been crawled
 		do{
-		//	userIdListToCrawl= reader.readUserNeighborsNotCrawlRelation(InstagramConfig.seedUserId, nSTEP);
-			userIdListToCrawl = reader.readUserIdFromBadUserTable();
+			userIdListToCrawl= reader.readUserNeighborsNotCrawlRelation(InstagramConfig.seedUserId, nSTEP);
+		//	userIdListToCrawl = reader.readUserIdFromBadUserTable();
 			System.out.println("total number: " + userIdListToCrawl.size());
 			//Loop for current userList
 			for(int i = 0; i < userIdListToCrawl.size(); i++){
 				String userId = userIdListToCrawl.get(i);
-				System.out.println(userId);
+				System.out.println(i + ": " + userId);
 				
 				//******Crawl followings and followers of current user********//
 				getRelationOfUser(userId);
@@ -154,10 +153,11 @@ public class InstagramRelationCrawler {
 			writeRelation2DB(userId, relationUserList, RELATIONTABLE, "followedby");
 			System.out.println("end: " + System.currentTimeMillis());
 		}
-		
+		/*		
 		if(flag_ing && flag_edby){
 			writer.deleteBadUser(userId, BADUSERTABLE);
 		}
+		 */
 	}
 	
 	
@@ -187,7 +187,7 @@ public class InstagramRelationCrawler {
 				}
 				else//if not the first page, re-crawl current page;
 				{
-					try {Thread.sleep(1500);} catch (InterruptedException e) {}
+					try {Thread.sleep(3000);} catch (InterruptedException e) {}
 					continue;
 				}
 			}

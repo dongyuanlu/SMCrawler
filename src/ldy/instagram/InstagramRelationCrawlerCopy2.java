@@ -85,9 +85,10 @@ public class InstagramRelationCrawlerCopy2 {
 			userIdListToCrawl = reader.readUserIdFromBadUserTable();
 			System.out.println("total number: " + userIdListToCrawl.size());
 			//Loop for current userList
-			for(int i = userIdListToCrawl.size()-1; i > 0; i--){
+			int i = userIdListToCrawl.indexOf("5872671");
+			for(i = i-1; i > 0; i--){
 				String userId = userIdListToCrawl.get(i);
-				System.out.println(userId);
+				System.out.println(i + ": "+userId);
 				
 				//******Crawl followings and followers of current user********//
 				getRelationOfUser(userId);
